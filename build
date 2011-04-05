@@ -1,0 +1,6 @@
+cd bin
+nasm -f elf -o loader.o ../assets/loader.s
+gcc -o kernel.o -c ../src/kernel.c -Wall -Wextra -m32 -nostdlib -nostartfiles -nodefaultlibs # -Werror
+ld -melf_i386 -T ../assets/linker.ld -o kernel.bin loader.o kernel.o
+cat ../assets/stage1 ../assets/stage2 ../assets/pad kernel.bin > floppy.img
+cd ..
