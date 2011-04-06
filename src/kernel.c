@@ -93,15 +93,8 @@ void kmain( void* mbd, unsigned int magic )
 	const int SCREEN_WIDTH = 80;
 	const int SCREEN_HEIGHT = 25;
 	
-	
-	int max_x = strlen(test_string);
-	int x, y;
-	for (y = 0; y < SCREEN_HEIGHT; y++) {
-		for (x = 0; x < max_x; x++) {
-			videoram[y*2*SCREEN_WIDTH + x*2] = char_A;	/* character 'A' */
-			videoram[y*2*SCREEN_WIDTH + x*2+1] = 0x07;	/* forground, background color. */
-		}
-	}
+	init_video();
+	puts("Hello OSWORLD!!!");
 
 	/* Write your kernel here. */
 }
