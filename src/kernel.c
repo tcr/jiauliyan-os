@@ -114,6 +114,9 @@ void kmain( void* mbd, unsigned int magic )
 	const int SCREEN_WIDTH = 80;
 	const int SCREEN_HEIGHT = 25;
 	
+	init_video();
+	puts("Hello OSWORLD!!!");
+/* 
 	
 	int max_x = strlen(test_string);
 	int x, y;
@@ -123,6 +126,6 @@ void kmain( void* mbd, unsigned int magic )
 			videoram[y*2*SCREEN_WIDTH + x*2+1] = textColors(RED, MAGENTA);	/* forground, background color. */
 		}
 	}
-
+*/
 	/* Write your kernel here. */
 }
