@@ -18,7 +18,7 @@
 #define WHITE 15
 
 int textColors(int foreground, int background){
-	return (foreground<<4) + background;
+	return foreground + (background<<4);
 }
 
 /* You will need to code these up yourself!  */
@@ -120,7 +120,7 @@ void kmain( void* mbd, unsigned int magic )
 	for (y = 0; y < SCREEN_HEIGHT; y++) {
 		for (x = 0; x < max_x; x++) {
 			videoram[y*2*SCREEN_WIDTH + x*2] = char_A;	/* character 'A' */
-			videoram[y*2*SCREEN_WIDTH + x*2+1] = textColors(LIGHT_BROWN, MAGENTA);	/* forground, background color. */
+			videoram[y*2*SCREEN_WIDTH + x*2+1] = textColors(RED, MAGENTA);	/* forground, background color. */
 		}
 	}
 
