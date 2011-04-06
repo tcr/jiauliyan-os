@@ -40,9 +40,14 @@ unsigned short *memsetw(unsigned short *dest, unsigned short val, int count)
 
 int strlen(const char *str)
 {
-	/* This loops through character array 'str', returning how
-	 *  many characters it needs to check before it finds a 0.
-	 *  In simple words, it returns the length in bytes of a string */
+    /* This loops through character array 'str', returning how
+    *  many characters it needs to check before it finds a 0.
+    *  In simple words, it returns the length in bytes of a string */
+    int i = 0;
+    while(str[i] != '\0'){
+		i++;
+	}
+	return i;
 }
 
 /* We will use this later on for reading from the I/O ports to get data
@@ -82,13 +87,19 @@ void kmain( void* mbd, unsigned int magic )
 	unsigned char *videoram = (unsigned char *) 0xb8000;
 
 	const char char_A = 65;
-	const int width = 80;
-	const int height = 25;
+	
+	char test_string[15] = "jialiyahuahauah";
+	
+	const int SCREEN_WIDTH = 80;
+	const int SCREEN_HEIGHT = 25;
+	
+	
+	int max_x = strlen(test_string);
 	int x, y;
-	for (y = 0; y < height; y++) {
-		for (x = 0; x < width; x++) {
-			videoram[y*2*width + x*2] = char_A;	/* character 'A' */
-			videoram[y*2*width + x*2+1] = 0x07;	/* forground, background color. */
+	for (y = 0; y < SCREEN_HEIGHT; y++) {
+		for (x = 0; x < max_x; x++) {
+			videoram[y*2*SCREEN_WIDTH + x*2] = char_A;	/* character 'A' */
+			videoram[y*2*SCREEN_WIDTH + x*2+1] = 0x07;	/* forground, background color. */
 		}
 	}
 
