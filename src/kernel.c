@@ -78,6 +78,8 @@ void kmain( void* mbd, unsigned int magic )
 		/* data structure. */
 	}
 
+	gdt_install();
+
 	/* You could either use multiboot.h */
 	/* (http://www.gnu.org/software/grub/manual/multiboot/multiboot.html#multiboot_002eh) */
 	/* or do your offsets yourself. The following is merely an example. */ 
