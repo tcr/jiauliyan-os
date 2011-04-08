@@ -33,4 +33,9 @@ extern void init_video();
 #define LIGHT_BROWN 14
 #define WHITE 15
 
+/* gdt.c */
+
+extern void gdt_set_gate(int num, unsigned long base, unsigned long limit, unsigned char access, unsigned char gran);
+extern void gdt_install();
+
 #endif

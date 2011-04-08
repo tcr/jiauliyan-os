@@ -10,6 +10,12 @@ gcc -o gdt.o -c ../src/gdt.c -Wall -Wextra -m32 -fno-builtin -nostdlib -nostartf
 echo
 echo [Linking]
 ld -melf_i386 -T ../assets/linker.ld -o kernel.bin loader.o gdt.o start.o kernel.o scrn.o 
+
+echo
+echo [Concat]
 cat ../assets/stage1 ../assets/stage2 ../assets/pad kernel.bin > floppy.img
+
+echo
+echo Done.
 
 cd ..
