@@ -6,10 +6,11 @@ nasm -f elf -o start.o ../src/start.s
 gcc -o kernel.o -c ../src/kernel.c -Wall -Wextra -m32 -fno-builtin -nostdlib -nostartfiles -nodefaultlibs -I../include # -Werror
 gcc -o scrn.o -c ../src/scrn.c -Wall -Wextra -m32 -fno-builtin -nostdlib -nostartfiles -nodefaultlibs -I../include # -Werror
 gcc -o gdt.o -c ../src/gdt.c -Wall -Wextra -m32 -fno-builtin -nostdlib -nostartfiles -nodefaultlibs -I../include # -Werror
+gcc -o idt.o -c ../src/idt.c -Wall -Wextra -m32 -fno-builtin -nostdlib -nostartfiles -nodefaultlibs -I../include # -Werror
 
 echo
 echo [Linking]
-ld -melf_i386 -T ../assets/linker.ld -o kernel.bin loader.o gdt.o start.o kernel.o scrn.o 
+ld -melf_i386 -T ../assets/linker.ld -o kernel.bin loader.o gdt.o start.o kernel.o scrn.o idt.o
 
 echo
 echo [Concat]
