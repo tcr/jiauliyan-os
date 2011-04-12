@@ -7,8 +7,8 @@ cd bin
 echo [Compiling]
 nasm -f elf -o loader.o ../assets/loader.s
 nasm -f elf -o start.o ../src/start.s
-$CC $CFLAGS -o kernel.o -c ../src/kernel.c
-$CC $CFLAGS -o scrn.o -c ../src/scrn.c
+
+$CC $CFLAGS -o ports.o -c ../src/ports.c
 $CC $CFLAGS -o gdt.o -c ../src/gdt.c
 $CC $CFLAGS -o idt.o -c ../src/idt.c
 $CC $CFLAGS -o isrs.o -c ../src/isrs.c
@@ -16,9 +16,13 @@ $CC $CFLAGS -o irq.o -c ../src/irq.c
 $CC $CFLAGS -o timer.o -c ../src/timer.c
 $CC $CFLAGS -o kb.o -c ../src/kb.c
 
+$CC $CFLAGS -o scrn.o -c ../src/scrn.c
+$CC $CFLAGS -o kernel.o -c ../src/kernel.c
+$CC $CFLAGS -o string.o -c ../src/string.c
+
 echo
 echo [Linking]
-ld -melf_i386 -T ../assets/linker.ld -o kernel.bin loader.o gdt.o isrs.o irq.o timer.o kb.o start.o kernel.o scrn.o idt.o
+ld -melf_i386 -T ../assets/linker.ld -o kernel.bin loader.o ports.o gdt.o isrs.o irq.o timer.o kb.o start.o kernel.o string.o scrn.o idt.o
 
 echo
 echo [Concat]

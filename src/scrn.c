@@ -77,7 +77,7 @@ void cls()
 }
 
 /* Puts a single character on the screen */
-void putch(char c)
+void putscrnc(char c)
 {
     unsigned short *where;
     unsigned att = attrib << 8;
@@ -132,13 +132,13 @@ void putch(char c)
 }
 
 /* Uses the above routine to output a string... */
-void puts(char *text)
+void putscrns(char *text)
 {
     int i;
 
     for (i = 0; i < strlen(text); i++)
     {
-        putch(text[i]);
+        putscrnc(text[i]);
     }
 }
 

@@ -1,4 +1,5 @@
 #include <system.h>
+#include <scrn.h>
 
 /* This will keep track of how many ticks that the system
 *  has been running for */
@@ -18,7 +19,7 @@ void timer_handler(struct regs *r)
     *  display a message on the screen */
     if (timer_ticks % 100 == 0)
     {
-        puts("One second has passed\n");
+        putscrns("One second has passed\n");
     }
 }
 
