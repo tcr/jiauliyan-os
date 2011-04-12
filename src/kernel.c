@@ -77,19 +77,30 @@ void kmain( void* mbd, unsigned int magic )
 		/* message and halt, but do *not* rely on the multiboot */
 		/* data structure. */
 	}
+	
+    gdt_install();
+    idt_install();
+    isrs_install();
+    irq_install();
+    init_video();
+    timer_install();
+    timer_phase(50);
+    /*keyboard_install();*/
 
-	gdt_install();
-	idt_install();
-	isrs_install();
+    __asm__ __volatile__ ("sti"); /* start interrupts */
 	
 	/* You could either use multiboot.h */
 	/* (http://www.gnu.org/software/grub/manual/multiboot/multiboot.html#multiboot_002eh) */
 	/* or do your offsets yourself. The following is merely an example. */ 
-	char * boot_loader_name =(char*) ((long*)mbd)[16];
+	char * boot_loader_name = (char*) ((long*)mbd)[16];
 	
-	init_video();
-	settextcolor(LIGHT_BROWN, LIGHT_CYAN);
-	puts("Hello OSWORLD!!!");
+	settextcolor(LIGHT_BROWN, MAGENTA);
+	puts("Hello OSWORLD!!!\n");
+	
+	/*
+	timer_wait(5);
+	
+	puts("TIMER DONE!!!");*/
 
 	/* Write your kernel here. */
 }
