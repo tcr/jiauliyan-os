@@ -16,6 +16,7 @@ gdt_flush:
     jmp 0x08:flush2   ; 0x08 is the offset to our code segment: Far jump!
 flush2:
     ret               ; Returns back to the C code!
+    
 ; Loads the IDT defined in '_idtp' into the processor.
 ; This is declared in C as 'extern void idt_load();'
 global idt_load
