@@ -1,5 +1,5 @@
 #include <system.h>
-#include <scrn.h>
+#include <vga.h>
 
 /* This will keep track of how many ticks that the system
 *  has been running for */

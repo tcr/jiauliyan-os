@@ -1,6 +1,6 @@
 #include <system.h>
 #include <string.h>
-#include <scrn.h>
+#include <vga.h>
 
 void kmain( void* mbd, unsigned int magic )
 {
