@@ -1,4 +1,5 @@
 #include <system.h>
+#include <string.h>
 
 /* These define our textpointer, our background and foreground
 *  colors (attributes), and x and y cursor coordinates */
@@ -140,6 +141,24 @@ void putscrns(char *text)
     {
         putscrnc(text[i]);
     }
+}
+
+/* print a decimal integer */
+void putscrni(unsigned int a)
+{
+	do {
+		/* print highest digit */
+		unsigned int b = a, d = 1;
+		while ((b / 10) > 0) {
+			d *= 10;
+			b /= 10;
+		}
+		putscrnc(0x30 + b);
+		
+		/* print rest */
+		while (a >= d)
+			a -= d;
+	} while (a > 0);
 }
 
 /* Sets the forecolor and backcolor that we will use */

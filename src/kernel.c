@@ -28,6 +28,9 @@ void kmain( void* mbd, unsigned int magic )
 	char * boot_loader_name = (char*) ((long*)mbd)[16];
 	
 	settextcolor(LIGHT_BROWN, MAGENTA);
+	putscrni(56);
+	putscrni(1232);
+	return;
 	putscrns("Hello OSWORLD!!!\n");
 	
 	timer_wait(500);
