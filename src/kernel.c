@@ -85,7 +85,7 @@ void kmain( void* mbd, unsigned int magic )
     init_video();
     timer_install();
     timer_phase(100);
-    /*keyboard_install();*/
+    keyboard_install();
 
     __asm__ __volatile__ ("sti"); /* start interrupts */
 	
@@ -102,4 +102,5 @@ void kmain( void* mbd, unsigned int magic )
 	puts("TIMER DONE!!!");
 
 	/* Write your kernel here. */
+	for(;;);
 }

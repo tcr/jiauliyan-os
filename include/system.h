@@ -71,4 +71,8 @@ extern void timer_wait(int ticks);
 extern void timer_install();
 extern void timer_phase(int hz);
 
+/* keyboard.c */
+
+extern void keyboard_install();
+
 #endif
