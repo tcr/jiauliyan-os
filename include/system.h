@@ -37,7 +37,7 @@ extern void irq_install_handler(int irq, void (*handler)(struct regs *r));
 
 /* timer.c */
 
-extern void timer_wait(int ticks);
+extern void timer_wait(unsigned int ticks);
 extern void timer_install();
 extern void timer_phase(int hz);
 

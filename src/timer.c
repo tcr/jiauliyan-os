@@ -3,7 +3,7 @@
 
 /* This will keep track of how many ticks that the system
 *  has been running for */
-int timer_ticks = 0;
+unsigned int timer_ticks = 0;
 
 /* Handles the timer. In this case, it's very simple: We
 *  increment the 'timer_ticks' variable every time the
@@ -41,7 +41,7 @@ void timer_phase(int hz)
 
 /* This will continuously loop until the given time has
 *  been reached */
-void timer_wait(int ticks)
+void timer_wait(unsigned int ticks)
 {
     unsigned long eticks;
     unsigned long t = timer_ticks;

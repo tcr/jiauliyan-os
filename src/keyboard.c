@@ -1,3 +1,4 @@
+#include <system.h>
 #include <vga.h>
 
 /* KBDUS means US Keyboard Layout. This is a scancode table
