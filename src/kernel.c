@@ -84,7 +84,7 @@ void kmain( void* mbd, unsigned int magic )
     irq_install();
     init_video();
     timer_install();
-    timer_phase(50);
+    timer_phase(100);
     /*keyboard_install();*/
 
     __asm__ __volatile__ ("sti"); /* start interrupts */
@@ -97,10 +97,9 @@ void kmain( void* mbd, unsigned int magic )
 	settextcolor(LIGHT_BROWN, MAGENTA);
 	puts("Hello OSWORLD!!!\n");
 	
-	/*
-	timer_wait(5);
+	timer_wait(500);
 	
-	puts("TIMER DONE!!!");*/
+	puts("TIMER DONE!!!");
 
 	/* Write your kernel here. */
 }
