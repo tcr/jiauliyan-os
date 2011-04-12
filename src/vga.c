@@ -22,11 +22,11 @@ void scroll(void)
         /* Move the current text chunk that makes up the screen
         *  back in the buffer by a line */
         temp = csr_y - 25 + 1;
-        memcpy((unsigned char *) textmemptr, (const unsigned char *) (textmemptr + temp * 80), (25 - temp) * 80 * 2);
+        memcpy(textmemptr, textmemptr + temp * 80, (25 - temp) * 80 * 2);
 
         /* Finally, we set the chunk of memory that occupies
         *  the last line of text to our 'blank' character */
-        memsetw((short unsigned int *) (textmemptr + (25 - temp) * 80), blank, 80);
+        memsetw(textmemptr + (25 - temp) * 80, blank, 80);
         csr_y = 25 - 1;
     }
 }
