@@ -59,4 +59,16 @@ struct regs
     unsigned int eip, cs, eflags, useresp, ss;   /* pushed by the processor automatically */ 
 };
 
+/* irq.c */
+
+extern void irq_install();
+extern void irq_uninstall_handler(int irq);
+extern void irq_install_handler(int irq, void (*handler)(struct regs *r));
+
+/* timer.c */
+
+extern void timer_wait(int ticks);
+extern void timer_install();
+extern void timer_phase(int hz);
+
 #endif
