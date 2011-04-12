@@ -11,8 +11,8 @@ extern void outportb (unsigned short _port, unsigned char _data);
 
 /* scrn.c */
 extern void cls();
-extern void putch(unsigned char c);
-extern void puts(unsigned char *str);
+extern void putch(char c);
+extern void puts(char *str);
 extern void settextcolor(unsigned char forecolor, unsigned char backcolor);
 extern void init_video();
 
@@ -33,13 +33,30 @@ extern void init_video();
 #define LIGHT_BROWN 14
 #define WHITE 15
 
+#define SCREEN_WIDTH 80
+#define SCREEN_HEIGHT 25
+
 /* gdt.c */
 
 extern void gdt_set_gate(int num, unsigned long base, unsigned long limit, unsigned char access, unsigned char gran);
 extern void gdt_install();
 
 /* idt.c */
+
 extern void idt_set_gate(unsigned char num, unsigned long base, unsigned short sel, unsigned char flags);
 extern void idt_install();
+
+/* isrs.c */
+
+extern void isrs_install();
+
+/* This defines what the stack looks like after an ISR was running */
+struct regs
+{
+    unsigned int gs, fs, es, ds;      /* pushed the segs last */
+    unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax;  /* pushed by 'pusha' */
+    unsigned int int_no, err_code;    /* our 'push byte #' and ecodes do this */
+    unsigned int eip, cs, eflags, useresp, ss;   /* pushed by the processor automatically */ 
+};
 
 #endif

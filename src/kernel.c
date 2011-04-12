@@ -80,26 +80,16 @@ void kmain( void* mbd, unsigned int magic )
 
 	gdt_install();
 	idt_install();
+	isrs_install();
 	
 	/* You could either use multiboot.h */
 	/* (http://www.gnu.org/software/grub/manual/multiboot/multiboot.html#multiboot_002eh) */
 	/* or do your offsets yourself. The following is merely an example. */ 
 	char * boot_loader_name =(char*) ((long*)mbd)[16];
-
-	/* Print a letter to screen to see everything is working: */
-	unsigned char *videoram = (unsigned char *) 0xb8000;
-
-	const char char_A = 65;
-	
-	char test_string[15] = "jialiyahuahauah";
-	
-	const int SCREEN_WIDTH = 80;
-	const int SCREEN_HEIGHT = 25;
 	
 	init_video();
-	settextcolor(LIGHT_BROWN, MAGENTA);
+	settextcolor(LIGHT_BROWN, LIGHT_CYAN);
 	puts("Hello OSWORLD!!!");
-
 
 	/* Write your kernel here. */
 }
