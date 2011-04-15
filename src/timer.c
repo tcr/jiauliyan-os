@@ -17,10 +17,10 @@ void timer_handler(struct regs *r)
 
     /* Every 18 clocks (approximately 1 second), we will
     *  display a message on the screen */
-    if (timer_ticks % 100 == 0)
+    /*if (timer_ticks % 100 == 0)
     {
         putscrns("One second has passed\n");
-    }
+    } */
 }
 
 /* Sets up the system clock by installing the timer handler

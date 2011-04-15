@@ -58,7 +58,7 @@ char * itoa( int i, char * s, int pos)
 {
 	if (i == 0) 
 		return s;
-	itoa(i / 10, char * s, pos + 1);
+	itoa(i / 10, s, pos + 1);
 	s[pos] = (char) ( (i % 10)  + 48);
 	return s;
 }
