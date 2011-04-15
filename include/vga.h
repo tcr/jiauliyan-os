@@ -2,6 +2,7 @@ extern void cls();
 extern void putscrnc(char c);
 extern void putscrns(char *str);
 extern void putscrni(unsigned int i);
+extern void putscrnp(void *p);
 extern void settextcolor(unsigned char forecolor, unsigned char backcolor);
 extern void init_video();
 

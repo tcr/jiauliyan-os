@@ -4,6 +4,7 @@
 
 void kmain( void* mbd, unsigned int magic )
 {
+	char test;
 	if ( magic != 0x2BADB002 )
 	{
 		/* Something went not according to specs. Print an error */
@@ -19,7 +20,8 @@ void kmain( void* mbd, unsigned int magic )
     timer_install();
     timer_phase(100);
     keyboard_install();
-
+	serial_install();
+	
     __asm__ __volatile__ ("sti"); /* start interrupts */
 	
 	/* You could either use multiboot.h */
@@ -27,14 +29,28 @@ void kmain( void* mbd, unsigned int magic )
 	/* or do your offsets yourself. The following is merely an example. */ 
 	char * boot_loader_name = (char*) ((long*)mbd)[16];
 	
+	int a = 5, b = 6;
+	
 	settextcolor(LIGHT_BROWN, MAGENTA);
 	putscrni(56);
 	putscrni(1232);
-	putscrns("Hello OSWORLD!!!\n");
 	
-	timer_wait(500);
-	
-	putscrns("TIMER DONE!!!");
+	putscrnc('\n');
+	putscrns("Pointer to main: ");
+	putscrnp(&kmain);
+	putscrnc('\n');
+
+	putscrns("Writing to serial port...\n");
+	write_serial('h');
+	write_serial('e');
+	write_serial('y');
+	write_serial('\n');
+	//test = read_serial();
+	//putscrnc(test);
+
+	putscrns("Waiting timer for 300 clicks:\n");	
+	timer_wait(300);	
+	putscrns("300 click timer DONE!\n");
 
 	/* Write your kernel here. */
 	for(;;);

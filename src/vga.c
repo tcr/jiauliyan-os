@@ -163,6 +163,24 @@ void putscrns(char *text)
 
 
 
+/* print a hex char */
+void putscrnhc(unsigned char h)
+{
+	int b = h & 0xF, a = (h >> 4) & 0xF;
+	putscrnc(a > 0x9 ? 0x61 - 0x0A + a : 0x30 + a);
+	putscrnc(b > 0x9 ? 0x61 - 0x0A + b : 0x30 + b);
+}
+
+/* print a pointer */
+void putscrnp(void *p)
+{
+	int i, siz = sizeof(void *), a;
+	putscrns("0x");
+	for (i = siz - 1; i >= 0; i--) {
+		putscrnhc((((int) p) >> (i*8)) & 0xFF);
+	}
+}
+
 /* Sets the forecolor and backcolor that we will use */
 	void settextcolor(unsigned char forecolor, unsigned char backcolor)
 	{
