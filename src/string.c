@@ -47,3 +47,35 @@ int strlen(const char *str)
 	return i;
 
 }
+
+char * strcpy( char * dest, char * source)
+{
+	int i = 0;
+	while(source[i] != '\0') {
+		dest[i] = source[i];
+		i++;
+	}
+	dest[i+1] = '\n';
+}
+
+char * strncpy( char * dest, char * source, int n)
+{
+	int i = 0;
+	while(i < n) {
+		dest[i] = source[i];
+		i++;
+	}
+	dest[i+1] = '\n';
+}
+
+char * strcat(char * str1, char * str2)
+{
+	strcpy(str1 + strlen(str1), str2);
+	return str1;
+}
+
+char * strncat(char * str1, char * str2, int n)
+{
+	strncpy(str1 + strlen(str1), str2, n);
+	return str1;
+}
