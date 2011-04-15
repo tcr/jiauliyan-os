@@ -45,4 +45,12 @@ extern void timer_phase(int hz);
 
 extern void keyboard_install();
 
+/* cereal ports */
+
+extern void init_serial();
+extern int serial_received();
+extern char read_serial();
+extern int is_transmit_empty();
+extern void write_serial(char a);
+
 #endif
