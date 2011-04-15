@@ -45,4 +45,5 @@ int strlen(const char *str)
 		i++;
 	}
 	return i;
+
 }
