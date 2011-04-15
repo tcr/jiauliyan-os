@@ -4,6 +4,7 @@
 
 void kmain( void* mbd, unsigned int magic )
 {
+	char test;
 	if ( magic != 0x2BADB002 )
 	{
 		/* Something went not according to specs. Print an error */
@@ -19,7 +20,8 @@ void kmain( void* mbd, unsigned int magic )
     timer_install();
     timer_phase(100);
     keyboard_install();
-
+	serial_install();
+	
     __asm__ __volatile__ ("sti"); /* start interrupts */
 	
 	/* You could either use multiboot.h */
@@ -30,6 +32,10 @@ void kmain( void* mbd, unsigned int magic )
 	settextcolor(LIGHT_BROWN, MAGENTA);
 	putscrni(56);
 	putscrni(1232);
+	write_serial('h');
+	write_serial('d');
+	//test = read_serial();
+	//putscrnc(test);
 	putscrns("Hello OSWORLD!!!\n");
 	
 	timer_wait(500);
@@ -58,7 +64,7 @@ char * itoa( int i, char * s, int pos)
 {
 	if (i == 0) 
 		return s;
-	itoa(i / 10, char * s, pos + 1);
+	itoa(i / 10, s, pos + 1);
 	s[pos] = (char) ( (i % 10)  + 48);
 	return s;
 }
