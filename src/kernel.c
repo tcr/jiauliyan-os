@@ -27,12 +27,19 @@ void kmain( void* mbd, unsigned int magic )
 	/* or do your offsets yourself. The following is merely an example. */ 
 	char * boot_loader_name = (char*) ((long*)mbd)[16];
 	
+	int a = 5, b = 6;
+	
 	settextcolor(LIGHT_BROWN, MAGENTA);
 	putscrni(56);
 	putscrni(1232);
-	putscrns("Hello OSWORLD!!!\n");
+	putscrnc('\n');
+	putscrns("Pointer to main: ");
+	putscrnp(&kmain);
+	putscrnc('\n');
+
+	putscrns("Waiting timer for 300 clicks:\n");
 	
-	timer_wait(500);
+	timer_wait(300);
 	
 	putscrns("TIMER DONE!!!");
 
