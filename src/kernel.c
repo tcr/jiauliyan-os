@@ -32,8 +32,6 @@ void kmain( void* mbd, unsigned int magic )
 	int a = 5, b = 6;
 	
 	settextcolor(LIGHT_BROWN, MAGENTA);
-	putscrni(56);
-	putscrni(1232);
 	
 	putscrnc('\n');
 	putscrns("Pointer to main: ");
