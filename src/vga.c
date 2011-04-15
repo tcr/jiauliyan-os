@@ -1,4 +1,5 @@
 #include <system.h>
+#include <string.h>
 
 /* These define our textpointer, our background and foreground
 *  colors (attributes), and x and y cursor coordinates */
@@ -21,11 +22,11 @@ void scroll(void)
         /* Move the current text chunk that makes up the screen
         *  back in the buffer by a line */
         temp = csr_y - 25 + 1;
-        memcpy (textmemptr, textmemptr + temp * 80, (25 - temp) * 80 * 2);
+        memcpy(textmemptr, textmemptr + temp * 80, (25 - temp) * 80 * 2);
 
         /* Finally, we set the chunk of memory that occupies
         *  the last line of text to our 'blank' character */
-        memsetw (textmemptr + (25 - temp) * 80, blank, 80);
+        memsetw(textmemptr + (25 - temp) * 80, blank, 80);
         csr_y = 25 - 1;
     }
 }
@@ -77,7 +78,7 @@ void cls()
 }
 
 /* Puts a single character on the screen */
-void putch(char c)
+void putscrnc(char c)
 {
     unsigned short *where;
     unsigned att = attrib << 8;
@@ -132,14 +133,32 @@ void putch(char c)
 }
 
 /* Uses the above routine to output a string... */
-void puts(char *text)
+void putscrns(char *text)
 {
     int i;
 
     for (i = 0; i < strlen(text); i++)
     {
-        putch(text[i]);
+        putscrnc(text[i]);
     }
+}
+
+/* print a decimal integer */
+void putscrni(unsigned int a)
+{
+	do {
+		/* print highest digit */
+		unsigned int b = a, d = 1;
+		while ((b / 10) > 0) {
+			d *= 10;
+			b /= 10;
+		}
+		putscrnc(0x30 + b);
+		
+		/* print rest */
+		while (a >= d)
+			a -= d;
+	} while (a > 0);
 }
 
 /* Sets the forecolor and backcolor that we will use */

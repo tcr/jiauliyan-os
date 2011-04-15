@@ -1,19 +1,28 @@
+# params
+CFLAGS="-Wall -Wextra -m32 -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -nostdlib -nostartfiles -nodefaultlibs -I../include" # -Werror
+CC="gcc"
+
 cd bin
 
 echo [Compiling]
 nasm -f elf -o loader.o ../assets/loader.s
 nasm -f elf -o start.o ../src/start.s
-gcc -Wall -Wextra -m32 -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -nostdlib -nostartfiles -nodefaultlibs -I../include -o kernel.o -c ../src/kernel.c # -Werror
-gcc -Wall -Wextra -m32 -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -nostdlib -nostartfiles -nodefaultlibs -I../include -o scrn.o -c ../src/scrn.c # -Werror
-gcc -Wall -Wextra -m32 -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -nostdlib -nostartfiles -nodefaultlibs -I../include -o gdt.o -c ../src/gdt.c # -Werror
-gcc -Wall -Wextra -m32 -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -nostdlib -nostartfiles -nodefaultlibs -I../include -o idt.o -c ../src/idt.c # -Werror
-gcc -Wall -Wextra -m32 -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -nostdlib -nostartfiles -nodefaultlibs -I../include -o isrs.o -c ../src/isrs.c # -Werror
-gcc -Wall -Wextra -m32 -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -nostdlib -nostartfiles -nodefaultlibs -I../include -o irq.o -c ../src/irq.c # -Werror
-gcc -Wall -Wextra -m32 -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -nostdlib -nostartfiles -nodefaultlibs -I../include -o timer.o -c ../src/timer.c # -Werror
+
+$CC $CFLAGS -o ports.o -c ../src/ports.c
+$CC $CFLAGS -o gdt.o -c ../src/gdt.c
+$CC $CFLAGS -o idt.o -c ../src/idt.c
+$CC $CFLAGS -o isrs.o -c ../src/isrs.c
+$CC $CFLAGS -o irq.o -c ../src/irq.c
+$CC $CFLAGS -o timer.o -c ../src/timer.c
+$CC $CFLAGS -o keyboard.o -c ../src/keyboard.c
+
+$CC $CFLAGS -o kernel.o -c ../src/kernel.c
+$CC $CFLAGS -o vga.o -c ../src/vga.c
+$CC $CFLAGS -o string.o -c ../src/string.c
 
 echo
 echo [Linking]
-ld -melf_i386 -T ../assets/linker.ld -o kernel.bin loader.o gdt.o isrs.o irq.o timer.o start.o kernel.o scrn.o idt.o
+ld -melf_i386 -T ../assets/linker.ld -o kernel.bin loader.o ports.o gdt.o idt.o isrs.o irq.o timer.o keyboard.o start.o kernel.o string.o vga.o
 
 echo
 echo [Concat]
