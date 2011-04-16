@@ -1,4 +1,6 @@
 #include <system.h>
+#include <vga.h>
+
 #define PORT 0x3f8   /* COM1 */
  
 int serial_received() {
@@ -21,9 +23,12 @@ void write_serial(char a) {
    outportb(PORT,a);
 }
 
-void serial_handler(struct regs *r) {
+void serial_handler(struct regs *r)
+{
+	(void) r;
+	
 	if (serial_received()) {
-		putscrnc(read_serial());
+		vga_putchar(read_serial());
 	}
 }
 

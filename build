@@ -13,17 +13,21 @@ $CC $CFLAGS -o gdt.o -c ../src/gdt.c
 $CC $CFLAGS -o idt.o -c ../src/idt.c
 $CC $CFLAGS -o isrs.o -c ../src/isrs.c
 $CC $CFLAGS -o irq.o -c ../src/irq.c
+
 $CC $CFLAGS -o timer.o -c ../src/timer.c
 $CC $CFLAGS -o keyboard.o -c ../src/keyboard.c
 $CC $CFLAGS -o cereal.o -c ../src/cereal.c
+$CC $CFLAGS -o vga.o -c ../src/vga.c
+
+$CC $CFLAGS -o stream.o -c ../src/stream.c
+$CC $CFLAGS -o stdio.o -c ../src/stdio.c
+$CC $CFLAGS -o string.o -c ../src/string.c
 
 $CC $CFLAGS -o kernel.o -c ../src/kernel.c
-$CC $CFLAGS -o vga.o -c ../src/vga.c
-$CC $CFLAGS -o string.o -c ../src/string.c
 
 echo
 echo [Linking]
-ld -melf_i386 -T ../assets/linker.ld -o kernel.bin loader.o ports.o gdt.o idt.o isrs.o irq.o timer.o keyboard.o start.o kernel.o string.o vga.o cereal.o
+ld -melf_i386 -T ../assets/linker.ld -o kernel.bin loader.o ports.o gdt.o idt.o isrs.o irq.o timer.o keyboard.o start.o stream.o stdio.o string.o kernel.o vga.o cereal.o
 
 echo
 echo [Concat]

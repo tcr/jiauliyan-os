@@ -1,10 +1,15 @@
-extern void cls();
-extern void putscrnc(char c);
-extern void putscrns(char *str);
-extern void putscrni(unsigned int i);
-extern void putscrnp(void *p);
-extern void settextcolor(unsigned char forecolor, unsigned char backcolor);
-extern void init_video();
+#ifndef __VGA_H
+#define __VGA_H
+
+#include <stream.h>
+
+extern void vga_cls();
+extern void vga_putchar(char c);
+extern void vga_setbg(unsigned char bg);
+extern void vga_setfg(unsigned char fg);
+extern void vga_init();
+
+extern stream_s *vgastream;
 
 #define BLACK 0
 #define BLUE 1
@@ -25,3 +30,5 @@ extern void init_video();
 
 #define SCREEN_WIDTH 80
 #define SCREEN_HEIGHT 25
+
+#endif

@@ -143,8 +143,8 @@ void fault_handler(struct regs *r)
 {
     if (r->int_no < 32)
     {
-        putscrns(exception_messages[r->int_no]);
-        putscrns(" Exception. System Halted!\n");
+        stream_puts(vgastream, exception_messages[r->int_no]);
+        stream_puts(vgastream, " Exception. System Halted!\n");
         for (;;);
     }
 }

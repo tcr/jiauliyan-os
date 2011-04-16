@@ -54,4 +54,8 @@ extern void write_serial(char a);
 extern void serial_handler();
 extern void serial_install();
 
+/* interrupts */
+
+#define interrupts_init() __asm__ __volatile__ ("sti")
+
 #endif

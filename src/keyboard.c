@@ -49,6 +49,8 @@ char kbdus[128] =
 /* Handles the keyboard interrupt */
 void keyboard_handler(struct regs *r)
 {
+	(void) r;
+	
     unsigned char scancode;
 
     /* Read from the keyboard's data buffer */
@@ -75,7 +77,7 @@ void keyboard_handler(struct regs *r)
         *  to the above layout to correspond to 'shift' being
         *  held. If shift is held using the larger lookup table,
         *  you would add 128 to the scancode when you look for it */
-        putscrnc(kbdus[scancode]);
+        vga_putchar(kbdus[scancode]);
     }
 }
 

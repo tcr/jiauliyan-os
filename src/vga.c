@@ -1,4 +1,5 @@
 #include <system.h>
+#include <stream.h>
 #include <string.h>
 
 /* These define our textpointer, our background and foreground
@@ -56,7 +57,7 @@ void move_csr(void)
 }
 
 /* Clears the screen */
-void cls()
+void vga_cls()
 {
 	unsigned blank;
 	int i;
@@ -78,7 +79,7 @@ void cls()
 }
 
 /* Puts a single character on the screen */
-void putscrnc(char c)
+void vga_putchar(char c)
 {
 	unsigned short *where;
 	unsigned att = attrib << 8;
@@ -132,66 +133,46 @@ void putscrnc(char c)
 	move_csr();
 }
 
-/* Uses the above routine to output a string... */
-void putscrns(char *text)
-{
-	int i;
-
-	for (i = 0; i < strlen(text); i++)
-	{
-		putscrnc(text[i]); 
-	}
-}
-
-/* print a decimal integer */
-void putscrni(unsigned int a)
-{
-	do {
-		/* print highest digit */
-		unsigned int b = a, d = 1;
-		while ((b / 10) > 0) {
-			d *= 10;
-			b /= 10;
-		}
-		putscrnc(0x30 + b);
-	
-		/* print rest */
-		while (a >= d)
-			a -= d;
-	} while (a > 0);
-}
-
-
-
-/* print a hex char */
-void putscrnhc(unsigned char h)
-{
-	int b = h & 0xF, a = (h >> 4) & 0xF;
-	putscrnc(a > 0x9 ? 0x61 - 0x0A + a : 0x30 + a);
-	putscrnc(b > 0x9 ? 0x61 - 0x0A + b : 0x30 + b);
-}
-
-/* print a pointer */
-void putscrnp(void *p)
-{
-	int i, siz = sizeof(void *), a;
-	putscrns("0x");
-	for (i = siz - 1; i >= 0; i--) {
-		putscrnhc((((int) p) >> (i*8)) & 0xFF);
-	}
-}
-
 /* Sets the forecolor and backcolor that we will use */
-void settextcolor(unsigned char forecolor, unsigned char backcolor)
+void vga_setbg(unsigned char bg)
 {
-	/* Top 4 bytes are the background, bottom 4 bytes
-	 *  are the foreground color */
-	attrib = (backcolor << 4) | (forecolor & 0x0F);
+	// upper nibble is bg
+	attrib = ((bg & 0x0F) << 4) | (attrib & 0x0F);
+}
+
+void vga_setfg(unsigned char fg)
+{
+	// lower nibble is fg
+	attrib = (attrib & 0xF0) | (fg & 0x0F);
 }
 
 /* Sets our text-mode VGA pointer, then clears the screen for us */
-void init_video(void)
+void vga_init(void)
 {
 	textmemptr = (unsigned short *)0xB8000;
-	cls();
+	vga_cls();
 }
+
+/* vga stream implementation */
+
+char vgastream_read(stream_s *stream)
+{
+	(void) stream;
+	return EOF;
+}
+
+int vgastream_write(stream_s *stream, unsigned char c)
+{
+	(void) stream;
+	vga_putchar((char) c);
+	return (int) c;
+}
+
+int vgastream_seek(stream_s *stream, long pos, int origin)
+{
+	(void) stream; (void) pos; (void) origin;
+	return 0;
+}
+
+stream_s vgastream_s = { vgastream_read, vgastream_write, vgastream_seek, NULL };
+stream_s *vgastream = &vgastream_s;
