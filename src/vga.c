@@ -153,9 +153,11 @@ void vga_init(void)
 	vga_cls();
 }
 
-/* vga stream implementation */
+/*
+ * vga stream implementation
+ */
 
-char vgastream_read(stream_s *stream)
+int vgastream_read(stream_s *stream)
 {
 	(void) stream;
 	return EOF;

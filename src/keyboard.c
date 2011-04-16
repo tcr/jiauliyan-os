@@ -77,6 +77,7 @@ void keyboard_handler(struct regs *r)
         *  to the above layout to correspond to 'shift' being
         *  held. If shift is held using the larger lookup table,
         *  you would add 128 to the scancode when you look for it */
+		vga_setfg(LIGHT_GREEN);
         vga_putchar(kbdus[scancode]);
     }
 }

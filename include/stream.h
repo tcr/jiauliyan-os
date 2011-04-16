@@ -8,7 +8,7 @@
 #define EOF -1
 
 typedef struct __stream {
-	char (*read)(struct __stream *stream); // reads a character
+	int (*read)(struct __stream *stream); // reads a character
 	int (*write)(struct __stream *stream, unsigned char s); // returns EOF on error, otherwise (int) s
 	int (*seek)(struct __stream *stream, long pos, int origin); // seeks to position
 	void *data; // data object

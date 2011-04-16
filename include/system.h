@@ -1,6 +1,8 @@
 #ifndef __SYSTEM_H
 #define __SYSTEM_H
 
+#include <stream.h>
+
 /* ports.c */
 
 extern unsigned char inportb (unsigned short _port);
@@ -47,12 +49,8 @@ extern void keyboard_install();
 
 /* cereal ports */
 
-extern int serial_received();
-extern char read_serial();
-extern int is_transmit_empty();
-extern void write_serial(char a);
-extern void serial_handler();
 extern void serial_install();
+extern stream_s *serialstream;
 
 /* interrupts */
 

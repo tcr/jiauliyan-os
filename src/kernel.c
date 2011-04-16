@@ -18,18 +18,30 @@ void kernel_start()
 	putchar('\n');
 
 	puts("Writing to serial port...\n");
-	write_serial('h');
-	write_serial('e');
-	write_serial('y');
-	write_serial('\n');
-	putchar('\n');
+	stream_puts(serialstream, "[SERIAL] Testing serial ports from Jiauliyan OS!\n");
 
 	puts("Waiting timer for 300 clicks:\n");
 	timer_wait(300);	
 	puts("300 click timer DONE!\n");
+	putchar('\n');
+	
+	puts("Testing input. Serial input is ");
+	vga_setfg(LIGHT_RED);
+	puts("red");
+	vga_setfg(WHITE);
+	puts(" and keyboard input is ");
+	vga_setfg(LIGHT_GREEN);
+	puts("green");
+	vga_setfg(WHITE);
+	puts(".\n");
 
 	/* Write your kernel here. */
-	for(;;);
+	int c;
+	for(;;) {
+		vga_setfg(LIGHT_RED);
+		while ((c = serialstream->read(serialstream)) != EOF)
+			vga_putchar((char) c);
+	}
 }
 
 void kmain( void* mbd, unsigned int magic )
