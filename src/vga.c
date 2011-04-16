@@ -144,22 +144,22 @@ void putscrns(char *text)
 }
 
 /* print a decimal integer */
-	void putscrni(unsigned int a)
-	{
-		do {
-			/* print highest digit */
-			unsigned int b = a, d = 1;
-			while ((b / 10) > 0) {
-				d *= 10;
-				b /= 10;
-			}
-			putscrnc(0x30 + b);
-		
-			/* print rest */
-			while (a >= d)
-				a -= d;
-		} while (a > 0);
-	}
+void putscrni(unsigned int a)
+{
+	do {
+		/* print highest digit */
+		unsigned int b = a, d = 1;
+		while ((b / 10) > 0) {
+			d *= 10;
+			b /= 10;
+		}
+		putscrnc(0x30 + b);
+	
+		/* print rest */
+		while (a >= d)
+			a -= d;
+	} while (a > 0);
+}
 
 
 
@@ -182,16 +182,16 @@ void putscrnp(void *p)
 }
 
 /* Sets the forecolor and backcolor that we will use */
-	void settextcolor(unsigned char forecolor, unsigned char backcolor)
-	{
-		/* Top 4 bytes are the background, bottom 4 bytes
-		 *  are the foreground color */
-		attrib = (backcolor << 4) | (forecolor & 0x0F);
-	}
+void settextcolor(unsigned char forecolor, unsigned char backcolor)
+{
+	/* Top 4 bytes are the background, bottom 4 bytes
+	 *  are the foreground color */
+	attrib = (backcolor << 4) | (forecolor & 0x0F);
+}
 
 /* Sets our text-mode VGA pointer, then clears the screen for us */
-	void init_video(void)
-	{
-		textmemptr = (unsigned short *)0xB8000;
-		cls();
-	}
+void init_video(void)
+{
+	textmemptr = (unsigned short *)0xB8000;
+	cls();
+}
