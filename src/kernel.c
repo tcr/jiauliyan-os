@@ -20,6 +20,7 @@ void kmain( void* mbd, unsigned int magic )
     timer_install();
     timer_phase(100);
     keyboard_install();
+    outportb(0x20,0x20);
 	serial_install();
 	
     __asm__ __volatile__ ("sti"); /* start interrupts */
@@ -43,8 +44,10 @@ void kmain( void* mbd, unsigned int magic )
 	write_serial('e');
 	write_serial('y');
 	write_serial('\n');
-	//test = read_serial();
-	//putscrnc(test);
+	putscrns("Reading from serial port (type a character): ");
+	test = read_serial();
+	putscrnc(test);
+	putscrnc('\n');
 
 	putscrns("Waiting timer for 300 clicks:\n");	
 	timer_wait(300);	

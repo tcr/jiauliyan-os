@@ -21,14 +21,14 @@ void write_serial(char a) {
    outportb(PORT,a);
 }
 
-void serial_handler() {
-	unsigned char scanInput;
-	//scanInput = inportb(PORT);
-	putscrnc('h');
+void serial_handler(struct regs *r) {
+	if (serial_received()) {
+		putscrnc(read_serial());
+	}
 }
 
 void serial_install() {
-	outportb(PORT + 1, 0x00);    // Disable all interrupts
+	outportb(PORT + 1, 0x01);    // enable Received Data Available interrupt
 	outportb(PORT + 3, 0x80);    // Enable DLAB (set baud rate divisor)
 	outportb(PORT + 0, 0x03);    // Set divisor to 3 (lo byte) 38400 baud
 	outportb(PORT + 1, 0x00);    //                  (hi byte)
