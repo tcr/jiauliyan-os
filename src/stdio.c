@@ -41,6 +41,7 @@ FILE *fopen(const char *filename, const char *mode)
 
 size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
 {
+	return -1;
 }
 
 FILE *freopen(const char *filename, const char *mode, FILE *stream)

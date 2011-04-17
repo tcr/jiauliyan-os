@@ -1,13 +1,9 @@
 #ifndef __STREAM_H
 #define __STREAM_H
 
-#ifndef NULL
-#define NULL    0
-#endif
+#include <stddef.h>
 
 #define EOF -1
-
-#define size_t unsigned int
 
 typedef struct __stream {
 	int (*read)(struct __stream *stream); // reads a character
