@@ -65,11 +65,13 @@ void keyboard_set_handler(void (*callback)(unsigned char *buf, long int size))
 
 void keyboard_flush()
 {
-	disable_interrupts();
-	if (keyboard_handler != NULL)
-		keyboard_handler(keyboard_buf, keyboard_buf_len);
-	keyboard_buf_len = 0;
-	enable_interrupts();
+	if (keyboard_buf_len > 0) {
+		disable_interrupts();
+		if (keyboard_handler != NULL)
+			keyboard_handler(keyboard_buf, keyboard_buf_len);
+		keyboard_buf_len = 0;
+		enable_interrupts();
+	}
 }
 
 void keyboard_interrupt(struct regs *r)

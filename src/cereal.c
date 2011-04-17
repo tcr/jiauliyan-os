@@ -48,11 +48,13 @@ void serial_set_handler(void (*callback)(unsigned char *buf, long int size))
 
 void serial_flush()
 {
-	disable_interrupts();
-	if (serial_handler != NULL)
-		serial_handler(serial_buf, serial_buf_len);
-	serial_buf_len = 0;
-	enable_interrupts();
+	if (serial_buf_len > 0) {
+		disable_interrupts();
+		if (serial_handler != NULL)
+			serial_handler(serial_buf, serial_buf_len);
+		serial_buf_len = 0;
+		enable_interrupts();
+	}
 }
 
 void serial_interrupt(struct regs *r)
