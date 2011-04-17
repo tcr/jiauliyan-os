@@ -5,6 +5,16 @@
 
 #define EOF -1
 
+#define SEEK_SET	0
+#define SEEK_CUR	1
+#define SEEK_END	2
+
+#define _IOFBF          0x000
+#define _IOLBF          0x001
+#define _IONBF          0x002
+
+#define BUFSIZ 1024
+
 typedef struct __stream {
 	int (*read)(struct __stream *stream); // reads a character
 	int (*write)(struct __stream *stream, unsigned char s); // returns EOF on error, otherwise (int) s

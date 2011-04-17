@@ -1,3 +1,4 @@
 cd lua-5.1/src
 make all
+make clean
 cd ../..

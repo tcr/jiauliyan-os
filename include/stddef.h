@@ -1,5 +1,5 @@
-#ifndef __STREAM_H
-#define __STREAM_H
+#ifndef __STDDEF_H
+#define __STDDEF_H
 
 #ifndef NULL
 #define NULL    0
