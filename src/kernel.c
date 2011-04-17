@@ -5,6 +5,15 @@
 
 void kernel_serial_handler(unsigned char *buf, long int size)
 {
+	vga_setfg(LIGHT_RED);
+	int i;
+	for (i = 0; i < size; i++)
+		vga_putchar((char) buf[i]);
+}
+
+void kernel_keyboard_handler(unsigned char *buf, long int size)
+{
+	vga_setfg(LIGHT_GREEN);
 	int i;
 	for (i = 0; i < size; i++)
 		vga_putchar((char) buf[i]);
@@ -12,7 +21,8 @@ void kernel_serial_handler(unsigned char *buf, long int size)
 
 void kernel_start()
 {
-	serial_set_handler(kernel_serial_handler);
+	serial_set_handler(kernel_serial_handler); // serial buffer handler
+	keyboard_set_handler(kernel_keyboard_handler); // keyboard buffer handler
 	
 	vga_setbg(BLUE);
 	vga_cls();
@@ -29,9 +39,9 @@ void kernel_start()
 	puts("Writing to serial port...\n");
 	stream_puts(serialstream, "[SERIAL] Testing serial ports from Jiauliyan OS!\n");
 
-	puts("Waiting timer for 300 clicks:\n");
-	timer_wait(300);	
-	puts("300 click timer DONE!\n");
+	puts("Waiting timer for 100 clicks:\n");
+	timer_wait(100);	
+	puts("100 click timer DONE!\n");
 	putchar('\n');
 	
 	puts("Testing input. Serial input is ");
@@ -47,9 +57,8 @@ void kernel_start()
 	/* Write your kernel here. */
 	int c;
 	for(;;) {
-		//vga_setfg(LIGHT_RED);
-		//while ((c = serialstream->read(serialstream)) != EOF)
-		//	vga_putchar((char) c);
+		keyboard_flush();
+		serial_flush();
 	}
 }
 
@@ -80,7 +89,7 @@ void kmain( void* mbd, unsigned int magic )
     timer_phase(100);
     keyboard_install();
 	serial_install();
-	interrupts_init();
+	enable_interrupts();
 	
 	// init std(in|out|err)
 	stdio_init();

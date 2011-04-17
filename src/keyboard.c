@@ -1,53 +1,78 @@
 #include <system.h>
+#include <string.h>
 #include <vga.h>
 
-/* KBDUS means US Keyboard Layout. This is a scancode table
-*  used to layout a standard US keyboard. I have left some
-*  comments in to give you an idea of what key is what, even
-*  though I set it's array index to 0. You can change that to
-*  whatever you want using a macro, if you wish! */
+#define KEYBOARD_BUF_SIZE 1024*4
+
+/* US Keyboard Layout. This is a scancode table
+ * used to layout a standard US keyboard. I have left some
+ * comments in to give you an idea of what key is what, even
+ * though I set it's array index to 0. You can change that to
+ * whatever you want using a macro, if you wish! */
+ 
 char kbdus[128] =
 {
-    0,  27, '1', '2', '3', '4', '5', '6', '7', '8',	/* 9 */
-  '9', '0', '-', '=', '\b',	/* Backspace */
-  '\t',			/* Tab */
-  'q', 'w', 'e', 'r',	/* 19 */
-  't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n',	/* Enter key */
-    0,			/* 29   - Control */
-  'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';',	/* 39 */
- '\'', '`',   0,		/* Left shift */
- '\\', 'z', 'x', 'c', 'v', 'b', 'n',			/* 49 */
-  'm', ',', '.', '/',   0,				/* Right shift */
-  '*',
-    0,	/* Alt */
-  ' ',	/* Space bar */
-    0,	/* Caps lock */
-    0,	/* 59 - F1 key ... > */
-    0,   0,   0,   0,   0,   0,   0,   0,
-    0,	/* < ... F10 */
-    0,	/* 69 - Num lock*/
-    0,	/* Scroll Lock */
-    0,	/* Home key */
-    0,	/* Up Arrow */
-    0,	/* Page Up */
-  '-',
-    0,	/* Left Arrow */
-    0,
-    0,	/* Right Arrow */
-  '+',
-    0,	/* 79 - End key*/
-    0,	/* Down Arrow */
-    0,	/* Page Down */
-    0,	/* Insert Key */
-    0,	/* Delete Key */
-    0,   0,   0,
-    0,	/* F11 Key */
-    0,	/* F12 Key */
-    0,	/* All other keys are undefined */
+	0,  27, '1', '2', '3', '4', '5', '6', '7', '8',	/* 9 */
+	'9', '0', '-', '=', '\b',	/* Backspace */
+	'\t',			/* Tab */
+	'q', 'w', 'e', 'r',	/* 19 */
+	't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n',	/* Enter key */
+	0,			/* 29   - Control */
+	'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';',	/* 39 */
+	'\'', '`',   0,		/* Left shift */
+	'\\', 'z', 'x', 'c', 'v', 'b', 'n',			/* 49 */
+	'm', ',', '.', '/',   0,				/* Right shift */
+	'*',
+	0,	/* Alt */
+	' ',	/* Space bar */
+	0,	/* Caps lock */
+	0,	/* 59 - F1 key ... > */
+	0,   0,   0,   0,   0,   0,   0,   0,
+	0,	/* < ... F10 */
+	0,	/* 69 - Num lock*/
+	0,	/* Scroll Lock */
+	0,	/* Home key */
+	0,	/* Up Arrow */
+	0,	/* Page Up */
+	'-',
+	0,	/* Left Arrow */
+	0,
+	0,	/* Right Arrow */
+	'+',
+	0,	/* 79 - End key*/
+	0,	/* Down Arrow */
+	0,	/* Page Down */
+	0,	/* Insert Key */
+	0,	/* Delete Key */
+	0,   0,   0,
+	0,	/* F11 Key */
+	0,	/* F12 Key */
+	0,	/* All other keys are undefined */
 };
 
-/* Handles the keyboard interrupt */
-void keyboard_handler(struct regs *r)
+/*
+ * interrupt/buffer
+ */
+
+unsigned char keyboard_buf[KEYBOARD_BUF_SIZE];
+int keyboard_buf_len = 0;
+void (*keyboard_handler)(unsigned char *buf, long int size) = NULL;
+
+void keyboard_set_handler(void (*callback)(unsigned char *buf, long int size))
+{
+	keyboard_handler = callback;
+}
+
+void keyboard_flush()
+{
+	disable_interrupts();
+	if (keyboard_handler != NULL)
+		keyboard_handler(keyboard_buf, keyboard_buf_len);
+	keyboard_buf_len = 0;
+	enable_interrupts();
+}
+
+void keyboard_interrupt(struct regs *r)
 {
 	(void) r;
 	
@@ -77,15 +102,39 @@ void keyboard_handler(struct regs *r)
         *  to the above layout to correspond to 'shift' being
         *  held. If shift is held using the larger lookup table,
         *  you would add 128 to the scancode when you look for it */
-		vga_setfg(LIGHT_GREEN);
-        vga_putchar(kbdus[scancode]);
+		keyboard_buf[keyboard_buf_len++] = kbdus[scancode];
+		if (keyboard_buf_len == KEYBOARD_BUF_SIZE)
+			keyboard_flush();
     }
 }
 
-/* Sets up the keyboard by installing the timer handler
-*  into IRQ1 */
+/*
+ * install
+ */
+
 void keyboard_install()
 {
-    /* Installs 'keyboard_handler' to IRQ1 */
-    irq_install_handler(1, keyboard_handler);
+    // installs keyboard interrupt handler to IRQ1
+    irq_install_handler(1, keyboard_interrupt);
 }
+
+/*
+ * keyboard stream implementation
+ */
+
+int keyboardstream_read(stream_s *stream)
+{
+	(void) stream;
+	
+	// read from serial buffer
+	if (keyboard_buf_len == 0)
+		return EOF;
+	unsigned char c = keyboard_buf[0];
+	memcpy(keyboard_buf, keyboard_buf + 1, --keyboard_buf_len);
+	return c;
+}
+
+stream_s keyboardstream_s = { keyboardstream_read, stream_no_write, stream_no_seek, NULL };
+stream_s *keyboardstream = &keyboardstream_s;
+
+

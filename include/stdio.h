@@ -14,7 +14,7 @@ typedef struct {
 	
 	unsigned char *buffer;	// data transfer buffer (min size 256)
 	int bsize;				// buffer size
-	unsigned char hold;		// ungetc char if no buffer
+	int hold;				// ungetc char if no buffer
 } FILE;
 
 /* stdio */

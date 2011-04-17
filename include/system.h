@@ -46,15 +46,20 @@ extern void timer_phase(int hz);
 /* keyboard.c */
 
 extern void keyboard_install();
+extern void keyboard_set_handler(void (*callback)(unsigned char *buf, long int size));
+extern void keyboard_flush();
+extern stream_s *keyboardstream;
 
 /* cereal ports */
 
 extern void serial_install();
 extern void serial_set_handler(void (*callback)(unsigned char *buf, long int size));
+extern void serial_flush();
 extern stream_s *serialstream;
 
 /* interrupts */
 
-#define interrupts_init() __asm__ __volatile__ ("sti")
+#define enable_interrupts() __asm__ __volatile__ ("sti")
+#define disable_interrupts() __asm__ __volatile__ ("cli")
 
 #endif

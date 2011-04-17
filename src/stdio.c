@@ -2,6 +2,11 @@
 #include <stream.h>
 #include <vga.h>
 
+int fgetc(FILE *file)
+{
+	return file->stream->read(file->stream);
+}
+
 int fputc(int c, FILE *file)
 {
 	return stream_putc(file->stream, (char) c);

@@ -1,10 +1,34 @@
 #include <stream.h>
 #include <string.h>
 
-/* text stream functions */
+/*
+ * stream impl dummies
+ */
+
+int stream_no_read(stream_s *stream)
+{
+	(void) stream;
+	return EOF;
+}
+
+int stream_no_write(stream_s *stream, unsigned char s)
+{
+	(void) stream; (void) s;
+	return EOF;
+}
+
+int stream_no_seek(stream_s *stream, long pos, int whence)
+{
+	(void) stream; (void) pos; (void) whence;
+	return -1;
+}
+
+/*
+ * text output
+ */
 
 /* put a string */
-int stream_puts(stream_s *stream, const char *text)
+size_t stream_puts(stream_s *stream, const char *text)
 {
 	int i;
 	for (i = 0; i < strlen(text); i++)

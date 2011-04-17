@@ -56,6 +56,7 @@ char * strcpy( char * dest, char * source)
 		i++;
 	}
 	dest[i+1] = '\n';
+	return dest;
 }
 
 char * strncpy( char * dest, char * source, int n)
@@ -66,6 +67,7 @@ char * strncpy( char * dest, char * source, int n)
 		i++;
 	}
 	dest[i+1] = '\n';
+	return dest;
 }
 
 char * strcat(char * str1, char * str2)

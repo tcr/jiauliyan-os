@@ -3,8 +3,11 @@
 #include <string.h>
 
 #define PORT 0x3f8   /* COM1 */
-#define SERIAL_BUF_SIZE 8
-//1024*4
+#define SERIAL_BUF_SIZE 1024*4
+
+/*
+ * serial port
+ */
  
 // flag if serial data has been received
 int serial_received()
@@ -30,6 +33,10 @@ void serial_write(unsigned char a)
    outportb(PORT, a);
 }
 
+/*
+ * interrupt/buffer
+ */
+
 unsigned char serial_buf[SERIAL_BUF_SIZE];
 int serial_buf_len = 0;
 void (*serial_handler)(unsigned char *buf, long int size) = NULL;
@@ -39,19 +46,28 @@ void serial_set_handler(void (*callback)(unsigned char *buf, long int size))
 	serial_handler = callback;
 }
 
+void serial_flush()
+{
+	disable_interrupts();
+	if (serial_handler != NULL)
+		serial_handler(serial_buf, serial_buf_len);
+	serial_buf_len = 0;
+	enable_interrupts();
+}
+
 void serial_interrupt(struct regs *r)
 {
 	(void) r;
 	if (serial_received()) {
-		serial_buf[serial_buf_len] = serial_read();
-		if (serial_buf_len == SERIAL_BUF_SIZE) {
-			if (serial_handler != NULL)
-				serial_handler(serial_buf, SERIAL_BUF_SIZE);
-			serial_buf_len = 0;
-		} else
-			serial_buf_len++;
+		serial_buf[serial_buf_len++] = serial_read();
+		if (serial_buf_len == SERIAL_BUF_SIZE)
+			serial_flush();
 	}
 }
+
+/*
+ * install
+ */
 
 void serial_install()
 {
@@ -90,12 +106,6 @@ int serialstream_write(stream_s *stream, unsigned char c)
 	return (int) c;
 }
 
-int serialstream_seek(stream_s *stream, long pos, int origin)
-{
-	(void) stream; (void) pos; (void) origin;
-	return 0;
-}
-
-stream_s serialstream_s = { serialstream_read, serialstream_write, serialstream_seek, NULL };
+stream_s serialstream_s = { serialstream_read, serialstream_write, stream_no_seek, NULL };
 stream_s *serialstream = &serialstream_s;
 
