@@ -3,10 +3,8 @@
 #include <string.h>
 
 #define PORT 0x3f8   /* COM1 */
-#define SERIAL_BUF_SIZE 1024*4
-
-unsigned char serial_buf[SERIAL_BUF_SIZE];
-int serial_buf_len = 0;
+#define SERIAL_BUF_SIZE 8
+//1024*4
  
 // flag if serial data has been received
 int serial_received()
@@ -32,11 +30,27 @@ void serial_write(unsigned char a)
    outportb(PORT, a);
 }
 
-void serial_handler(struct regs *r)
+unsigned char serial_buf[SERIAL_BUF_SIZE];
+int serial_buf_len = 0;
+void (*serial_handler)(unsigned char *buf, long int size) = NULL;
+
+void serial_set_handler(void (*callback)(unsigned char *buf, long int size))
+{
+	serial_handler = callback;
+}
+
+void serial_interrupt(struct regs *r)
 {
 	(void) r;
-	if (serial_received() && (serial_buf_len < SERIAL_BUF_SIZE))
-		serial_buf[serial_buf_len++] = serial_read();
+	if (serial_received()) {
+		serial_buf[serial_buf_len] = serial_read();
+		if (serial_buf_len == SERIAL_BUF_SIZE) {
+			if (serial_handler != NULL)
+				serial_handler(serial_buf, SERIAL_BUF_SIZE);
+			serial_buf_len = 0;
+		} else
+			serial_buf_len++;
+	}
 }
 
 void serial_install()
@@ -50,7 +64,7 @@ void serial_install()
 	outportb(PORT + 4, 0x0B);    // IRQs enabled, RTS/DSR set
 
 	/* Installs 'serial_handler' to IRQ4 */
-	irq_install_handler(4, serial_handler);
+	irq_install_handler(4, serial_interrupt);
 }
 
 /*

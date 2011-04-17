@@ -50,6 +50,7 @@ extern void keyboard_install();
 /* cereal ports */
 
 extern void serial_install();
+extern void serial_set_handler(void (*callback)(unsigned char *buf, long int size));
 extern stream_s *serialstream;
 
 /* interrupts */

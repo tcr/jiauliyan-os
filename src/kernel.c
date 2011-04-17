@@ -3,8 +3,17 @@
 #include <vga.h>
 #include <stdio.h>
 
+void kernel_serial_handler(unsigned char *buf, long int size)
+{
+	int i;
+	for (i = 0; i < size; i++)
+		vga_putchar((char) buf[i]);
+}
+
 void kernel_start()
 {
+	serial_set_handler(kernel_serial_handler);
+	
 	vga_setbg(BLUE);
 	vga_cls();
 	
@@ -38,9 +47,9 @@ void kernel_start()
 	/* Write your kernel here. */
 	int c;
 	for(;;) {
-		vga_setfg(LIGHT_RED);
-		while ((c = serialstream->read(serialstream)) != EOF)
-			vga_putchar((char) c);
+		//vga_setfg(LIGHT_RED);
+		//while ((c = serialstream->read(serialstream)) != EOF)
+		//	vga_putchar((char) c);
 	}
 }
 
