@@ -12,6 +12,11 @@ double acos(double x)
 	return (M_PI_2 - asin(x));
 }
 
+double asin(double x)
+{
+	return __builtin_asin(x);
+}
+
 double atan(double x)
 {
 	return asin(x / sqrt(x * x + 1));

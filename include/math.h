@@ -27,6 +27,7 @@
 
 /* trigonometric functions */
 extern double acos(double x);
+extern double asin(double x);
 extern double atan(double x);
 extern double atan2(double y, double x);
 extern double cos(double x);
