@@ -4,9 +4,9 @@
  * copying
  */
  
-unsigned void *memcpy(void *dest, const void *src, int count)
+void *memcpy(void *dest, const void *src, size_t count)
 {
-	int i = 0;
+	unsigned int i;
 	for (i = 0; i < count; i++) {
 		((unsigned char *) dest)[i] = ((unsigned char *) src)[i];
 	}
@@ -18,7 +18,7 @@ void *memmove(void *dest, const void *src, size_t count)
 	//[TODO]
 }
 
-char *strcpy(char *dest, char *source)
+char *strcpy(char *dest, const char *source)
 {
 	int i = 0;
 	while(source[i] != '\0') {
@@ -29,9 +29,9 @@ char *strcpy(char *dest, char *source)
 	return dest;
 }
 
-char *strncpy(char *dest, char *source, int n)
+char *strncpy(char *dest, const char *source, size_t n)
 {
-	int i = 0;
+	unsigned int i = 0;
 	while(i < n) {
 		dest[i] = source[i];
 		i++;
@@ -146,7 +146,7 @@ void *memset(void *dest, int val, int count)
 	return dest;
 }
 
-void *memsetw(void *dest, int val, int count)
+void *memsetw(void *dest, short int val, int count)
 {
 	/* Same as above, but this time, we're working with a 16-bit
 	 *  'val' and dest pointer. Your code can be an exact copy of
