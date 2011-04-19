@@ -53,6 +53,8 @@ void kernel_start()
 	puts("green");
 	vga_setfg(WHITE);
 	puts(".\n");
+	
+	stream_puti(vgastream, strcmp("apples", "bpples"));
 
 	/* Write your kernel here. */
 	int c;

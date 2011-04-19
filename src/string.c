@@ -65,9 +65,19 @@ int memcmp(const void *str1, const void *str2, size_t n)
 	//[TODO]
 }
 
-int strcmp(const char *str1, const char *str2)
+int strcmp(const char *a, const char *b)
 {
-	//[TODO]
+	signed int i, val, len1 = strlen(a), len2 = strlen(b);
+	for (i = 0; i < len1 && i < len2; i++) {
+		if ((val = a[i] - b[i]) != 0)
+			return val;
+	}
+	if (i == len1 && i < len2)
+		return 0 - b[i];
+	else if (i == len1 && i < len2)
+		return a[i] - 0;
+	else
+		return 0;
 }
 
 int strcoll(const char *str1, const char *str2)
