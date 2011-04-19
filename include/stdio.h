@@ -27,6 +27,7 @@ typedef struct {
 extern void clearerr(FILE *file);
 extern int fclose(FILE *file);
 extern int feof(FILE *file);
+extern int ferror(FILE *file);
 extern int fflush(FILE *file);
 extern int fgetpos(FILE *file, int *pos);
 extern FILE *fopen(const char *filename, const char *mode);
@@ -35,6 +36,7 @@ extern FILE *freopen(const char *filename, const char *mode, FILE *stream);
 extern int fseek(FILE *file, long int offset, int whence);
 extern long int ftell(FILE *file);
 extern size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *file);
+extern int remove(const char *filename);
 extern int rename(const char *old_filename, const char *new_filename);
 extern void rewind(FILE *file);
 extern void setbuf(FILE *stream, char *buffer);
@@ -76,6 +78,8 @@ extern int fputc(int character, FILE *file);
 #define putchar(C) fputc(C, stdout)
 extern int fputs(const char *str, FILE *file);
 #define puts(C) fputs(C, stdout)
+
+extern int ungetc(int c, FILE *file);
 
 /*
  * standard streams

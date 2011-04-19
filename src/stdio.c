@@ -24,6 +24,11 @@ int feof(FILE *file)
 	return -1;
 }
 
+int ferror(FILE *file)
+{
+	return -1;
+}
+
 int fflush(FILE *file)
 {
 	return -1;
@@ -60,6 +65,11 @@ long int ftell(FILE *file)
 }
 
 size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *file)
+{
+	return -1;
+}
+
+int remove(const char *filename)
 {
 	return -1;
 }
