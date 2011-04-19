@@ -12,10 +12,10 @@ CFLAGS= -O2 -Wall $(MYCFLAGS)
 AR= ar rcu
 RANLIB= ranlib
 RM= rm -f
-LIBS= -lm $(MYLIBS)
+LIBS= $(MYLIBS) $(MYLDFLAGS)
 
-MYCFLAGS=-DLUA_ANSI -Wall -Wextra -m32 -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -nostdlib -nostartfiles -nodefaultlibs -I../../include
-MYLDFLAGS=
+MYCFLAGS= -DLUA_ANSI -Wall -Wextra -m32 -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -nostdlib -nostartfiles -nodefaultlibs -I../../include
+MYLDFLAGS= -Wall -Wextra -m32
 MYLIBS=
 
 # == END OF USER SETTINGS. NO NEED TO CHANGE ANYTHING BELOW THIS LINE =========
