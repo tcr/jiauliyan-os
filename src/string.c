@@ -129,7 +129,16 @@ char *strncat(char *str1, const char *str2, size_t n)
 
 int memcmp(const void *str1, const void *str2, size_t n)
 {
-	//[TODO]
+	const unsigned char *a = av;
+	const unsigned char *b = bv;
+	size_t i;
+ 
+	for (i=0; i<len; i++) {
+		if (a[i] != b[i]) {
+			return (int)(a[i] - b[i]);
+		}
+	}
+	return 0;
 }
 
 int strcmp(const char *a, const char *b)
@@ -149,12 +158,20 @@ int strcmp(const char *a, const char *b)
 
 int strcoll(const char *str1, const char *str2)
 {
-	//[TODO]
+	return strcmp(str1, str2);
 }
 
 int strncmp(const char *str1, const char *str2, size_t n)
 {
-	//[TODO]
+        if (n == 0)
+                return (0);
+        do {
+                if (*str1 != *str2++)
+                        return (*(unsigned char *)str1 - *(unsigned char *)--str2);
+                if (*str1++ == 0)
+                        break;
+        } while (--n != 0);
+        return (0);
 }
 
 size_t strxfrm(char *str1, const char *str2, size_t n)
