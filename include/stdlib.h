@@ -19,6 +19,7 @@ extern unsigned long int strtoul(const char *start, char **endptr, int radix);
 
 /* memory functions */
 extern void free(void *ptr);
+extern void *malloc(size_t size);
 extern void *realloc(void *ptr, size_t size);
 
 /* math functions */

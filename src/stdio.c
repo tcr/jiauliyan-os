@@ -1,9 +1,24 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <stream.h>
 #include <stdarg.h>
+#include <string.h>
 #include <vga.h>
 
 // http://www.acm.uiuc.edu/webmonkeys/book/c_guide/2.12.html#streams
+
+/*
+ * virtual filesystem
+ */
+
+typedef struct {
+	char name[256];
+	char *data;
+	size_t size;
+} file_entry;
+
+file_entry *root[256];
+
 
 /*
  * file functions
@@ -41,7 +56,24 @@ int fgetpos(FILE *file, int *pos)
 
 FILE *fopen(const char *filename, const char *mode)
 {
-	return NULL;
+	int i;
+	for (i = 0; i < 256; i++) {
+		if (root[i] != NULL && strcmp(&root[i]->name, filename) == 0) {
+			puts("Found matching file\n");
+			return NULL;
+		}
+	}
+	for (i = 0; i < 256; i++) {
+		if (root[i] == NULL) {
+			puts("Creating file...\n");
+			root[i] = (file_entry *) malloc(sizeof(file_entry));
+			strncpy(&(root[i]->name), filename, 256);
+			root[i]->data = NULL;
+			root[i]->size = 0;
+			return NULL;
+		}
+	}
+	puts("ERROR: No file space left!");
 }
 
 size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream)

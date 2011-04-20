@@ -85,26 +85,29 @@ void *memmove(void *dest, const void *src, size_t count)
 	return dest;
 }
 
-char *strcpy(char *dest, const char *source)
+char *strcpy(char *to, const char *from)
 {
-	int i = 0;
-	while(source[i] != '\0') {
-		dest[i] = source[i];
-		i++;
-	}
-	dest[i+1] = '\n';
-	return dest;
+	char *save = to;
+	for (; (*to = *from) != '\0'; ++from, ++to);
+	return save;
 }
 
-char *strncpy(char *dest, const char *source, size_t n)
+char *strncpy(char *dst, const char *src, size_t n)
 {
-	unsigned int i = 0;
-	while(i < n) {
-		dest[i] = source[i];
-		i++;
+	if (n != 0) {
+		char *d = dst;
+		const char *s = src;
+
+		do {
+			if ((*d++ = *s++) == 0) {
+				/* NUL pad the remaining n-1 bytes */
+				while (--n != 0)
+					*d++ = 0;
+				break;
+			}
+		} while (--n != 0);
 	}
-	dest[i+1] = '\n';
-	return dest;
+	return dst;
 }
 
 /*

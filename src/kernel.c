@@ -1,4 +1,5 @@
 #include <system.h>
+#include <stdlib.h>
 #include <string.h>
 #include <vga.h>
 #include <stdio.h>
@@ -54,7 +55,8 @@ void kernel_start()
 	vga_setfg(WHITE);
 	puts(".\n");
 	
-	stream_puti(vgastream, strcmp("apples", "bpples"));
+	fopen("apple.txt", "w");
+	fopen("apple.txt", "w");
 
 	/* Write your kernel here. */
 	int c;
