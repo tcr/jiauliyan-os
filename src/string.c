@@ -129,11 +129,11 @@ char *strncat(char *str1, const char *str2, size_t n)
 
 int memcmp(const void *str1, const void *str2, size_t n)
 {
-	const unsigned char *a = av;
-	const unsigned char *b = bv;
+	const unsigned char *a = str1;
+	const unsigned char *b = str2;
 	size_t i;
  
-	for (i=0; i<len; i++) {
+	for (i=0; i<n; i++) {
 		if (a[i] != b[i]) {
 			return (int)(a[i] - b[i]);
 		}
