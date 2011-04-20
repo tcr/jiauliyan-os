@@ -103,6 +103,43 @@ void free(void *ap)
     freep = p;
 }
 
+/*
+ * realloc
+ */
+
+void *realloc(void *ptr, size_t size)
+{
+	void *newptr = NULL;
+	if (size > 0)
+		newptr = malloc(size);
+	if (ptr != NULL) {
+		if (size > 0) {
+			// copy data to new space
+			//[TODO]
+		}
+		free(ptr);
+	}
+	return newptr;
+}
+
+/*
+ * math functions
+ */
+
+int abs(int value)
+{
+	return value < 0 ? -value : value;
+}
+
+int rand(void)
+{
+	return 7;
+}
+
+void srand(unsigned int seed)
+{
+	(void) seed;
+}
 
 	        
 	    

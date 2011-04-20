@@ -23,12 +23,15 @@ $CC $CFLAGS -o stream.o -c ../src/stream.c
 $CC $CFLAGS -o stdio.o -c ../src/stdio.c
 $CC $CFLAGS -o string.o -c ../src/string.c
 $CC $CFLAGS -o stdlib.o -c ../src/stdlib.c
+$CC $CFLAGS -o math.o -c ../src/math.c
+$CC $CFLAGS -o errno.o -c ../src/errno.c
+$CC $CFLAGS -o etc.o -c ../src/etc.c
 
 $CC $CFLAGS -o kernel.o -c ../src/kernel.c
 
 echo
 echo [Linking]
-ld -melf_i386 -T ../assets/linker.ld -o kernel.bin loader.o ports.o gdt.o idt.o isrs.o irq.o timer.o keyboard.o start.o stdlib.o stream.o stdio.o string.o kernel.o vga.o cereal.o
+ld -melf_i386 -T ../assets/linker.ld -o kernel.bin loader.o ports.o gdt.o idt.o isrs.o irq.o timer.o keyboard.o vga.o cereal.o math.o etc.o errno.o start.o stdlib.o stream.o stdio.o string.o kernel.o ../lua-5.1/src/*.o
 
 echo
 echo [Concat]

@@ -18,8 +18,6 @@ typedef struct {
 	unsigned char *buffer;	// data transfer buffer (min size 256)
 	int bsize;				// buffer size
 	int hold;				// ungetc char if no buffer
-	
-	unsigned char open;
 } FILE;
 
 /*

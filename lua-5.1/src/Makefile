@@ -15,7 +15,7 @@ RM= rm -f
 LIBS= $(MYLIBS) $(MYLDFLAGS)
 
 MYCFLAGS= -DLUA_ANSI -Wall -Wextra -m32 -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -nostdlib -nostartfiles -nodefaultlibs -I../../include
-MYLDFLAGS= -Wall -Wextra -m32
+MYLDFLAGS= 
 MYLIBS=
 
 # == END OF USER SETTINGS. NO NEED TO CHANGE ANYTHING BELOW THIS LINE =========

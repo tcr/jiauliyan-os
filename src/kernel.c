@@ -55,11 +55,14 @@ void kernel_start()
 	vga_setfg(WHITE);
 	puts(".\n");
 	
-	fopen("apple.txt", "w");
-	fopen("apple.txt", "w");
+	FILE *f = fopen("apple.txt", "w");
+	fputc('A', f);
+	fclose(f);
+	f = fopen("apple.txt", "r");
+	vga_putchar(fgetc(f));
+	fclose(f);
 
 	/* Write your kernel here. */
-	int c;
 	for(;;) {
 		keyboard_flush();
 		serial_flush();

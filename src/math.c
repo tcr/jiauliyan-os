@@ -62,13 +62,13 @@ double cos(double x)
 }
 
 double cosh(double x)
-
+{
 	x = exp(x);
 	return ((x + (1.0 / x)) / 2.0);
 }
 
 double sin(double x)
-
+{
 	return __builtin_sin(x);
 }
 
@@ -129,6 +129,8 @@ double pow(double b, double e)
 {
 	return exp(e * log(b));
 }
+
+#define DBL_EPSILON 2.2204460492503131e-16
 
 double sqrt(double x)
 {
