@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdint.h>
 
 /*
  * copying
@@ -81,7 +82,7 @@ void *memmove(void *dest, const void *src, size_t count)
 		}
 	}
  
-	return dst;
+	return dest;
 }
 
 char *strcpy(char *dest, const char *source)
