@@ -28,7 +28,7 @@ extern char *strpbrk(const char *str1, const char *str2);
 extern char *strrchr(const char *str, int c);
 extern size_t strspn(const char *str1, const char *str2);
 extern char *strstr(const char *str1, const char *str2);
-extern char *strtok_r(char *s, const char *delim, char **last)
+extern char *strtok_r(char *s, const char *delim, char **last);
 extern char *strtok(char *str1, const char *str2);
 
 /* other */
