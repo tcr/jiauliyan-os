@@ -35,7 +35,7 @@
 #define SIGNAL_H
 
 #define SIGHANDLER_T void
-
+#define NSIG 32
 #define SIGINT          2               // Interrupt
 #define SIGILL          4               // Illegal instruction
 #define SIGFPE          8               // Floating point exception
