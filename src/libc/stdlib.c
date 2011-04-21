@@ -2,6 +2,7 @@
 #include <stream.h>
 #include <system.h>
 #include <stdio.h>
+#include <string.h>
 
 #include <vga.h>
 
@@ -56,13 +57,15 @@ void* malloc(unsigned nbytes) {
     }
 }
 
-#define NALLOC 	1024	/* minimum #units to request	*/
+#define NALLOC 	1024*1024*256/sizeof(Header)	/* minimum #units to request	*/
 
 static int first = 1;
 
 char *sbrk(int nbytes) {
-	if (first == 0)
+	if (first == 0) {
+		puts("\nREQUESTING MEMORY WHERE THERE IS NONE\n");
 		return NULL;
+	}
 	first--;
 	return (char *) 0x10000000;
 }
@@ -118,8 +121,8 @@ void *realloc(void *ptr, size_t size)
 	if (ptr != NULL) {
 		if (size > 0) {
 			Header *bp = (Header*) ptr - 1;		/* point to block header */
-			int bsize = (bp->s.size - 1) * sizeof(Header);
-			int dsize = size > bsize ? bsize : size;
+			unsigned int bsize = (bp->s.size - 1) * sizeof(Header);
+			unsigned int dsize = size > bsize ? bsize : size;
 			memcpy(newptr, ptr, dsize);
 			memset(newptr + dsize, 0, size - dsize);
 		}

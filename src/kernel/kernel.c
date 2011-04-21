@@ -3,11 +3,11 @@
 #include <string.h>
 #include <vga.h>
 #include <stdio.h>
+#include <setjmp.h>
 
-
-#include "../lua-5.1/src/lua.h"
-#include "../lua-5.1/src/lualib.h"
-#include "../lua-5.1/src/lauxlib.h"
+#include "../../lua-5.1/src/lua.h"
+#include "../../lua-5.1/src/lualib.h"
+#include "../../lua-5.1/src/lauxlib.h"
 
 void kernel_serial_handler(unsigned char *buf, long int size)
 {
@@ -64,14 +64,14 @@ void kernel_start()
 	fputs("print(\"Hello world!\");", f);
 	fclose(f);
 	
-	//lua_State* l;
-	//int dofile;
-	///* initialize lua */
-	//l = lua_open();
-	///* load lua libraries */
-	////luaL_openlibs(l);
+	lua_State* l;
+	int dofile;
+	/* initialize lua */
+//	l = lua_open();
+	/* load lua libraries */
+	//luaL_openlibs(l);
 	//// run the hello.lua script 
-	///*dofile = luaL_dofile(l, "hello.lua");
+	//dofile = luaL_dofile(l, "hello.lua");
 	//if (dofile == 0) {
 		//// call foo
 		////lua_getglobal(l,"foo");
@@ -80,8 +80,8 @@ void kernel_start()
 		//puts( "Error, unable to run hello.lua\n");
 	//}
 	//// cleanup Lua
-	//lua_close(l);*/
-	//puts("Done with lua");
+	//lua_close(l);
+	puts("Done with lua");
 
 	/* Write your kernel here. */
 	for(;;) {

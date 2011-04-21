@@ -46,17 +46,6 @@ unsigned long int strtoul(const char *start, char **endptr, int radix)
 	return 0;
 }
 
-int setjmp(jmp_buf env)
-{
-	stream_puts(serialstream, "setjmp() called.\n");
-	return -1;
-}
-
-void longjmp(jmp_buf env, int value)
-{
-	stream_puts(serialstream, "longjmp() called.\n");
-}
-
 struct tm *gmtime(const time_t *timer)
 {
 	stream_puts(serialstream, "gmtime() called.\n");

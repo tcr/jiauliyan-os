@@ -1,37 +1,29 @@
 # params
-CFLAGS="-Wall -Wextra -m32 -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -nostdlib -nostartfiles -nodefaultlibs -I../include" # -Werror
+CFLAGS="-Wall -Wextra -m32 -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -nostdlib -nostartfiles -nodefaultlibs -I../src/sys -I../src/libc -I../src/kernel" # -Werror
 CC="gcc"
 
 cd bin
 
 echo [Compiling]
-nasm -f elf -o loader.o ../assets/loader.s
-nasm -f elf -o start.o ../src/start.s
 
-$CC $CFLAGS -o ports.o -c ../src/ports.c
-$CC $CFLAGS -o gdt.o -c ../src/gdt.c
-$CC $CFLAGS -o idt.o -c ../src/idt.c
-$CC $CFLAGS -o isrs.o -c ../src/isrs.c
-$CC $CFLAGS -o irq.o -c ../src/irq.c
+for filename in ../src/*/*.s
+do
+	echo Compiling $filename ...
+	file=`basename $filename .s`
+	nasm -f elf -o $file.o $filename
+done;
 
-$CC $CFLAGS -o timer.o -c ../src/timer.c
-$CC $CFLAGS -o keyboard.o -c ../src/keyboard.c
-$CC $CFLAGS -o cereal.o -c ../src/cereal.c
-$CC $CFLAGS -o vga.o -c ../src/vga.c
-
-$CC $CFLAGS -o stream.o -c ../src/stream.c
-$CC $CFLAGS -o stdio.o -c ../src/stdio.c
-$CC $CFLAGS -o string.o -c ../src/string.c
-$CC $CFLAGS -o stdlib.o -c ../src/stdlib.c
-$CC $CFLAGS -o math.o -c ../src/math.c
-$CC $CFLAGS -o errno.o -c ../src/errno.c
-$CC $CFLAGS -o etc.o -c ../src/etc.c
-
-$CC $CFLAGS -o kernel.o -c ../src/kernel.c
+for filename in ../src/*/*.c
+do
+	echo Compiling $filename ...
+	file=`basename $filename .c`
+	$CC $CFLAGS -o $file.o -c $filename
+done;
 
 echo
 echo [Linking]
-ld -melf_i386 -T ../assets/linker.ld -o kernel.bin loader.o ports.o gdt.o idt.o isrs.o irq.o timer.o keyboard.o vga.o cereal.o math.o etc.o errno.o start.o stdlib.o stream.o stdio.o string.o kernel.o ../lua-5.1/src/*.o
+mv loader.o loader.me
+ld -melf_i386 -T ../assets/linker.ld -o kernel.bin loader.me *.o ../lua-5.1/src/*.o
 
 echo
 echo [Concat]

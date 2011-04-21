@@ -1,6 +1,8 @@
 #ifndef TIME_H
 #define TIME_H
 
+#include <stddef.h>
+
 #define CLOCKS_PER_SEC  1000
 
 typedef unsigned int time_t;

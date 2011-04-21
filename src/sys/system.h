@@ -1,8 +1,6 @@
 #ifndef __SYSTEM_H
 #define __SYSTEM_H
 
-#include <stream.h>
-
 /* ports.c */
 
 extern unsigned char inportb (unsigned short _port);
@@ -36,26 +34,6 @@ struct regs
 extern void irq_install();
 extern void irq_uninstall_handler(int irq);
 extern void irq_install_handler(int irq, void (*handler)(struct regs *r));
-
-/* timer.c */
-
-extern void timer_wait(unsigned int ticks);
-extern void timer_install();
-extern void timer_phase(int hz);
-
-/* keyboard.c */
-
-extern void keyboard_install();
-extern void keyboard_set_handler(void (*callback)(unsigned char *buf, long int size));
-extern void keyboard_flush();
-extern stream_s *keyboardstream;
-
-/* cereal ports */
-
-extern void serial_install();
-extern void serial_set_handler(void (*callback)(unsigned char *buf, long int size));
-extern void serial_flush();
-extern stream_s *serialstream;
 
 /* interrupts */
 
