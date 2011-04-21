@@ -1,6 +1,9 @@
 #include <stdlib.h>
 #include <stream.h>
+#include <system.h>
 #include <stdio.h>
+
+#include <vga.h>
 
 /*
  * K&R malloc
@@ -114,8 +117,11 @@ void *realloc(void *ptr, size_t size)
 		newptr = malloc(size);
 	if (ptr != NULL) {
 		if (size > 0) {
-			// copy data to new space
-			//[TODO]
+			Header *bp = (Header*) ptr - 1;		/* point to block header */
+			int bsize = (bp->s.size - 1) * sizeof(Header);
+			int dsize = size > bsize ? bsize : size;
+			memcpy(newptr, ptr, dsize);
+			memset(newptr + dsize, 0, size - dsize);
 		}
 		free(ptr);
 	}

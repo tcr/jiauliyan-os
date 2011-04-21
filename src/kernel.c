@@ -4,6 +4,11 @@
 #include <vga.h>
 #include <stdio.h>
 
+
+#include "../lua-5.1/src/lua.h"
+#include "../lua-5.1/src/lualib.h"
+#include "../lua-5.1/src/lauxlib.h"
+
 void kernel_serial_handler(unsigned char *buf, long int size)
 {
 	vga_setfg(LIGHT_RED);
@@ -55,12 +60,28 @@ void kernel_start()
 	vga_setfg(WHITE);
 	puts(".\n");
 	
-	FILE *f = fopen("apple.txt", "w");
-	fputc('A', f);
+	FILE *f = fopen("hello.lua", "w");
+	fputs("print(\"Hello world!\");", f);
 	fclose(f);
-	f = fopen("apple.txt", "r");
-	vga_putchar(fgetc(f));
-	fclose(f);
+	
+	//lua_State* l;
+	//int dofile;
+	///* initialize lua */
+	//l = lua_open();
+	///* load lua libraries */
+	////luaL_openlibs(l);
+	//// run the hello.lua script 
+	///*dofile = luaL_dofile(l, "hello.lua");
+	//if (dofile == 0) {
+		//// call foo
+		////lua_getglobal(l,"foo");
+		////lua_call(l,0,0);
+	//} else {
+		//puts( "Error, unable to run hello.lua\n");
+	//}
+	//// cleanup Lua
+	//lua_close(l);*/
+	//puts("Done with lua");
 
 	/* Write your kernel here. */
 	for(;;) {
@@ -103,27 +124,4 @@ void kmain( void* mbd, unsigned int magic )
 	
 	// start kernel
 	kernel_start();
-}
-
-/* put these somewhere else eventually */
-char *reverse( char * s)
-{
-	int i, len;
-	char temp;
-	len = strlen(s);
-	for ( i=0; i < len/2; i++) {
-		temp = s[i];
-		s[i] = s[len - 1 - i]; /*i=0 -> length -1 not outside bounds*/
-		s[len - 1 - i] = temp;
-	}
-	return s;
-}
-
-char *itoa( int i, char * s, int pos) 
-{
-	if (i == 0) 
-		return s;
-	itoa(i / 10, s, pos + 1);
-	s[pos] = (char) ( (i % 10)  + 48);
-	return s;
 }
