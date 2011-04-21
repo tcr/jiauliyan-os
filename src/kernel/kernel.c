@@ -1,9 +1,12 @@
 #include <system.h>
 #include <stdlib.h>
 #include <string.h>
-#include <vga.h>
 #include <stdio.h>
 #include <setjmp.h>
+
+#include <vga.h>
+#include <serial.h>
+#include <keyboard.h>
 
 #include "../../lua-5.1/src/lua.h"
 #include "../../lua-5.1/src/lualib.h"

@@ -7,6 +7,7 @@
 
 #include <stream.h>
 #include <system.h>
+#include <serial.h>
 
 sighandler_t signal(int signum, sighandler_t handler)
 {
