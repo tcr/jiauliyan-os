@@ -43,7 +43,8 @@ int system(const char *string)
 double strtod(const char *start, char **endptr)
 {
 	stream_puts(serialstream, "strtod() called.\n");
-	return 0;
+	(*endptr)++;
+	return 5;
 }
 
 unsigned long strtoul(char *nptr, char **endptr, int base)

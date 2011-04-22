@@ -70,6 +70,10 @@ void kernel_start()
 	puts(".\n");
 	*/
 	
+	vga_setfg(LIGHT_BROWN);
+    puts("\nLua source:\n\n");
+    vga_setfg(WHITE);
+    
 	int size = (int)&_binary_os_lua_size;
     char *data = (char *)&_binary_os_lua_start;
     
@@ -78,6 +82,10 @@ void kernel_start()
 	FILE *f = fopen("hello.lua", "w");
 	fputs(data, f);
 	fclose(f);
+	
+	vga_setfg(LIGHT_BROWN);
+    puts("\nRunning lua:\n\n");
+    vga_setfg(WHITE);
 	
 	lua_State* l;
 	int dofile;
@@ -99,7 +107,8 @@ void kernel_start()
 	}
 	// cleanup Lua
 	lua_close(l);
-	puts("Done with lua");
+	vga_setfg(LIGHT_GREEN);
+	puts("\nDone with lua");
 
 	/* Write your kernel here. */
 	for(;;) {
