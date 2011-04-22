@@ -51,11 +51,14 @@ void kernel_start()
 	puts("Writing to serial port...\n");
 	stream_puts(serialstream, "[SERIAL] Testing serial ports from Jiauliyan OS!\n");
 
+	/*
 	puts("Waiting timer for 100 clicks:\n");
 	timer_wait(100);	
 	puts("100 click timer DONE!\n");
 	putchar('\n');
+	*/
 	
+	/*
 	puts("Testing input. Serial input is ");
 	vga_setfg(LIGHT_RED);
 	puts("red");
@@ -65,6 +68,7 @@ void kernel_start()
 	puts("green");
 	vga_setfg(WHITE);
 	puts(".\n");
+	*/
 	
 	int size = (int)&_binary_os_lua_size;
     char *data = (char *)&_binary_os_lua_start;
