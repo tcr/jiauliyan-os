@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdint.h>
+#include <errno.h>
 
 /*
  * copying
@@ -402,9 +403,18 @@ void *memsetw(void *dest, short int val, int count)
 	return dest;
 }
 
+static char *error_strs[4] = {
+	"No error",
+	"Parameter outside function domain",
+	"Result outside function range",
+	"Illegal character sequence"
+};
+
 char *strerror(int errnum)
 {
-	return "Error";
+	if (errnum >= 0 && errnum <= 3)
+		return error_strs[errnum];
+	return error_strs[0];
 }
 
 int strlen(const char *str)

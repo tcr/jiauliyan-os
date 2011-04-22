@@ -1,4 +1,5 @@
-print("Hello world!");
+print("Hello world!")
+
 function foo()
-	print("Hi I am the foo function!");
+	print("Hi I am the foo function!")
 end

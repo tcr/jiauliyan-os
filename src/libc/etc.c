@@ -19,7 +19,8 @@ char *no_data = "";
 
 char *getenv(const char *name)
 {
-	stream_puts(serialstream, "getenv() called.\n");
+	stream_puts(serialstream, name);
+	stream_puts(serialstream, " getenv() called.\n");
 	return no_data;
 }
 
