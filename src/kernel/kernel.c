@@ -12,6 +12,9 @@
 #include "../../lua-5.1/src/lualib.h"
 #include "../../lua-5.1/src/lauxlib.h"
 
+extern int _binary_os_lua_start;
+extern int _binary_os_lua_size;
+
 void kernel_serial_handler(unsigned char *buf, long int size)
 {
 	vga_setfg(LIGHT_RED);
@@ -63,27 +66,35 @@ void kernel_start()
 	vga_setfg(WHITE);
 	puts(".\n");
 	
+	int size = (int)&_binary_os_lua_size;
+    char *data = (char *)&_binary_os_lua_start;
+    
+    puts(data);
+	
 	FILE *f = fopen("hello.lua", "w");
-	fputs("print(\"Hello world!\");", f);
+	fputs(data, f);
 	fclose(f);
 	
 	lua_State* l;
 	int dofile;
 	/* initialize lua */
-//	l = lua_open();
+	l = lua_open();
 	/* load lua libraries */
-	//luaL_openlibs(l);
+	luaL_openlibs(l);
 	//// run the hello.lua script 
-	//dofile = luaL_dofile(l, "hello.lua");
-	//if (dofile == 0) {
-		//// call foo
-		////lua_getglobal(l,"foo");
-		////lua_call(l,0,0);
-	//} else {
-		//puts( "Error, unable to run hello.lua\n");
-	//}
-	//// cleanup Lua
-	//lua_close(l);
+	dofile = luaL_dofile(l, "hello.lua");
+	if (dofile == 0) {
+		// call foo
+		lua_getglobal(l,"foo");
+		lua_call(l,0,0);
+	} else {
+		
+	stream_puts(vgastream, "Error: ");
+	stream_puti(vgastream, dofile);
+		puts( "\nError, unable to run hello.lua\n");
+	}
+	// cleanup Lua
+	lua_close(l);
 	puts("Done with lua");
 
 	/* Write your kernel here. */

@@ -4,6 +4,9 @@
 #include <stdarg.h>
 #include <string.h>
 #include <vga.h>
+ 
+ #include <stream.h>
+ #include <serial.h>
 
 // http://www.acm.uiuc.edu/webmonkeys/book/c_guide/2.12.html#streams
 
@@ -62,6 +65,7 @@ int file_entry_seek(stream_s *stream, long pos, int origin)
 
 void clearerr(FILE *file)
 {
+	stream_puts(serialstream, "clearerr() called");
 	//[TODO]
 }
 
@@ -75,12 +79,13 @@ int fclose(FILE *file)
 
 int feof(FILE *file)
 {
-	return -1;
+	puts("feof called.\n");
+	return 0;
 }
 
 int ferror(FILE *file)
 {
-	return -1;
+	return 0;
 }
 
 int fflush(FILE *file)
@@ -139,63 +144,91 @@ FILE *fopen(const char *filename, const char *mode)
 	puts("ERROR: No file space left!");
 }
 
-size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
+size_t fread(void *ptr, size_t size, size_t nmemb, FILE *file)
 {
-	return -1;
+	unsigned char *p = (unsigned char *) ptr;
+	unsigned int i;
+	size_t j;
+	int a;
+	for (i = 0; i < nmemb; i++) {
+		for (j = 0; j < size; j++) {
+			a = file->stream->read(file->stream);
+			if (a == EOF) break;
+			p[i*size + j] = (unsigned char) a;
+		}
+		if (a == EOF) break;
+	}
+	stream_puti(serialstream, size);
+	stream_puts(serialstream, " - ");
+	stream_puti(serialstream, nmemb);
+	stream_puts(serialstream, " fread() called\n");
+	return i;
 }
 
 FILE *freopen(const char *filename, const char *mode, FILE *stream)
 {
+	stream_puts(serialstream, "freopen() called\n");
 	return NULL;
 }
 
 int fseek(FILE *file, long int offset, int whence)
 {
+	stream_puts(serialstream, "fseek() called\n");
+	file->stream->seek(file->stream, offset, whence);
 	return -1;
 }
 
 long int ftell(FILE *file)
 {
+	stream_puts(serialstream, "fteel() called\n");
 	return -1;
 }
 
 size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *file)
 {
+	stream_puts(serialstream, "fwrite() called\n");
 	return -1;
 }
 
 int remove(const char *filename)
 {
+	stream_puts(serialstream, "remove() called\n");
 	return -1;
 }
 
 int rename(const char *old_filename, const char *new_filename)
 {
+	stream_puts(serialstream, "rename() called\n");
 	return -1;
 }
 
 void rewind(FILE *file)
 {
+	stream_puts(serialstream, "rewind() called\n");
 	return -1;
 }
 
 void setbuf(FILE *stream, char *buffer)
 {
+	stream_puts(serialstream, "setbuf() called\n");
 	return -1;
 }
 
 int setvbuf(FILE *stream, char *buffer, int mode, size_t size)
 {
+	stream_puts(serialstream, "setvbuf() called\n");
 	return -1;
 }
 
 FILE *tmpfile(void)
 {
+	stream_puts(serialstream, "tmpfile() called\n");
 	return NULL;
 }
 
 char *tmpnam(char *str)
 {
+	stream_puts(serialstream, "tmpnam() called\n");
 	return NULL;
 }
 
@@ -205,31 +238,39 @@ char *tmpnam(char *str)
  
 int fprintf(FILE *stream, const char *format, ...)
 {
+	stream_puts(serialstream, "fprintf() called\n");
 	return -1;
 }
 
 int printf(const char *format, ...)
 {
+	stream_puts(serialstream, "printf() called\n");
 	return -1;
 }
 
 int sprintf(char *str, const char *format, ...)
 {
-	return -1;
+	str[0] = '#';
+	str[1] = '\0';
+	stream_puts(serialstream, "sprintf() called\n");
+	return 1;
 }
 
 int vfprintf(FILE *stream, const char *format, va_list arg)
 {
+	stream_puts(serialstream, "vprintf() called\n");
 	return -1;
 }
 
 int vprintf(const char *format, va_list arg)
 {
+	stream_puts(serialstream, "vprintf() called\n");
 	return -1;
 }
 
 int vsprintf(char *str, const char *format, va_list arg)
 {
+	stream_puts(serialstream, "vsprintf() called\n");
 	return -1;
 }
 
@@ -239,16 +280,19 @@ int vsprintf(char *str, const char *format, va_list arg)
  
 int fscanf(FILE *stream, const char *format, ...)
 {
+	stream_puts(serialstream, "fscanf() called\n");
 	return -1;
 }
 
 int scanf(const char *format, ...)
 {
+	stream_puts(serialstream, "scanf() called\n");
 	return -1;
 }
 
 int sscanf(const char *str, const char *format, ...)
 {
+	stream_puts(serialstream, "sscanf() called\n");
 	return -1;
 }
 
@@ -261,6 +305,7 @@ int fgetc(FILE *file)
 	if (file->stream == NULL)
 		return EOF;
 		
+	stream_puts(serialstream, "fgetc() called\n");
 	file->pos++;
 	return file->stream->read(file->stream);
 }
@@ -298,6 +343,8 @@ int fputs(const char *string, FILE *file)
 
 int ungetc(int c, FILE *file)
 {
+	stream_puts(serialstream, "ungetc() called\n");
+	fseek(file, 0, 0);
 	//[TODO]
 	return EOF;
 }

@@ -14,7 +14,7 @@ RANLIB= ranlib
 RM= rm -f
 LIBS= $(MYLIBS) $(MYLDFLAGS)
 
-MYCFLAGS= -DLUA_ANSI -Wall -Wextra -m32 -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -nostdlib -nostartfiles -nodefaultlibs -I../../include
+MYCFLAGS= -DLUA_ANSI -Wall -Wextra -m32 -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -nostdlib -nostartfiles -nodefaultlibs -I../../src/kernel -I../../src/sys -I../../src/libc
 MYLDFLAGS= 
 MYLIBS=
 

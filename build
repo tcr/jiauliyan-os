@@ -10,20 +10,29 @@ for filename in ../src/*/*.s
 do
 	echo Compiling $filename ...
 	file=`basename $filename .s`
-	nasm -f elf -o $file.o $filename
+	nasm -f elf -o $file.s.o $filename
 done;
 
 for filename in ../src/*/*.c
 do
 	echo Compiling $filename ...
 	file=`basename $filename .c`
-	$CC $CFLAGS -o $file.o -c $filename
+	$CC $CFLAGS -o $file.c.o -c $filename
+done;
+
+for filename in ../src/scripts/*.lua
+do
+	echo Including $filename ...
+	file=`basename $filename .lua`
+	pushd `dirname $filename`
+	objcopy -I binary -O elf32-i386 --binary-architecture i386 $file.lua ../../bin/$file.lua.o
+	popd
 done;
 
 echo
 echo [Linking]
-mv loader.o loader.me
-ld -melf_i386 -T ../assets/linker.ld -o kernel.bin loader.me *.o ../lua-5.1/src/*.o
+mv loader.s.o loader.me
+ld -melf_i386 -T ../assets/linker.ld -o kernel.bin loader.me *.s.o *.c.o *.lua.o ../lua-5.1/src/*.o
 
 echo
 echo [Concat]

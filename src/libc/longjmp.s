@@ -14,21 +14,20 @@
 
 [bits 32]
 
-global setjmp:function setjmp.end-setjmp
+section .text
 
-setjmp:
-	mov eax, [esp+4]
+global longjmp:function longjmp.end-longjmp
 
-	pop ecx
+longjmp:
+	mov edx, [esp+4]
+	mov eax, [esp+8]
 	
-	mov [eax+0x00], esp
-	mov [eax+0x04], ebp
-	mov [eax+0x08], ecx
-	mov [eax+0x0C], ebx
-	mov [eax+0x10], edi
-	mov [eax+0x14], esi
-
-	xor eax, eax
+	mov esp, [edx+0x00]
+	mov ebp, [edx+0x04]
+	mov ecx, [edx+0x08]
+	mov ebx, [edx+0x0C]
+	mov edi, [edx+0x10]
+	mov esi, [edx+0x14]
 
 	push ecx
 	ret

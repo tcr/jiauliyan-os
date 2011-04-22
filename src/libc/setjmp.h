@@ -37,8 +37,10 @@ typedef struct __jmp_buf jmp_buf[1];
 
 extern int setjmp(jmp_buf env);
 
+extern int Sum(int a, int b);
+
 /* load stack context *******************************************************/
 
 extern int longjmp(jmp_buf env, int val);
 
-#endif/*SETJMP_H*/
+#endif

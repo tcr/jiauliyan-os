@@ -91,6 +91,9 @@ void free(void *ap)
 {
     Header *bp, *p;
     
+	if (ap == NULL)
+		return;
+    
     bp = (Header*) ap - 1;		/* point to block header */
     for (p = freep; !(bp > p && bp < p->s.ptr); p = p->s.ptr)
 		if (p >= p->s.ptr && (bp > p || bp < p->s.ptr))
