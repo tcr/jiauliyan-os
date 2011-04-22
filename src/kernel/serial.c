@@ -1,6 +1,7 @@
 #include <system.h>
 #include <stream.h>
 #include <string.h>
+#include <common.h>
 
 #define PORT 0x3f8   /* COM1 */
 #define SERIAL_BUF_SIZE 1024*4
@@ -59,13 +60,41 @@ void serial_flush()
 
 void serial_interrupt(struct regs *r)
 {
-	(void) r;
+	UNUSED(r);
+	
 	if (serial_received()) {
 		serial_buf[serial_buf_len++] = serial_read();
 		if (serial_buf_len == SERIAL_BUF_SIZE)
 			serial_flush();
 	}
 }
+
+/*
+ * serial stream implementation
+ */
+
+int serialin_read(stream_s *stream)
+{
+	UNUSED(stream);
+	
+	// read from serial buffer
+	if (serial_buf_len == 0)
+		return EOF;
+	unsigned char c = serial_buf[0];
+	memcpy(serial_buf, serial_buf + 1, --serial_buf_len);
+	return c;
+}
+
+int serialout_write(stream_s *stream, unsigned char c)
+{
+	UNUSED(stream);
+	
+	serial_write((char) c);
+	return (int) c;
+}
+
+stream_s *serialout;
+stream_s *serialin;
 
 /*
  * install
@@ -83,31 +112,8 @@ void serial_install()
 
 	/* Installs 'serial_handler' to IRQ4 */
 	irq_install_handler(4, serial_interrupt);
-}
-
-/*
- * serial stream implementation
- */
-
-int serialstream_read(stream_s *stream)
-{
-	(void) stream;
 	
-	// read from serial buffer
-	if (serial_buf_len == 0)
-		return EOF;
-	unsigned char c = serial_buf[0];
-	memcpy(serial_buf, serial_buf + 1, --serial_buf_len);
-	return c;
+	// create streams
+	serialout = stream_create(stream_no_read, serialout_write, stream_no_seek, NULL);
+	serialin = stream_create(serialin_read, stream_no_write, stream_no_seek, NULL);
 }
-
-int serialstream_write(stream_s *stream, unsigned char c)
-{
-	(void) stream;
-	serial_write((char) c);
-	return (int) c;
-}
-
-stream_s serialstream_s = { serialstream_read, serialstream_write, stream_no_seek, NULL };
-stream_s *serialstream = &serialstream_s;
-

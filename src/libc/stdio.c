@@ -1,12 +1,13 @@
+#include <common.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stream.h>
 #include <stdarg.h>
 #include <string.h>
 #include <vga.h>
- 
- #include <stream.h>
- #include <serial.h>
+
+#include <stream.h>
+#include <serial.h>
 
 // http://www.acm.uiuc.edu/webmonkeys/book/c_guide/2.12.html#streams
 
@@ -17,15 +18,15 @@
 typedef struct {
 	char name[256];
 	unsigned char *data;
-	size_t size;
-	size_t max;
+	long int size;
+	long int max;
 } file_entry;
 
 file_entry *root[256];
 
 typedef struct {
 	file_entry *entry;
-	unsigned int pos;
+	long int pos;
 } file_entry_data;
 
 /* file entry data stream */
@@ -41,10 +42,13 @@ int file_entry_read(stream_s *stream)
 int file_entry_write(stream_s *stream, unsigned char c)
 {
 	file_entry_data *f = (file_entry_data *) stream->data;
+	
+	// expand file size
 	if (f->pos >= f->entry->max) {
-		//[TODO] expand file size
-		return EOF;
+		f->entry->max += 1024;
+		f->entry->data = (unsigned char *) realloc(f->entry->data, f->entry->max);
 	}
+
 	if (f->pos + 1 > f->entry->size)
 		f->entry->size = f->pos + 1;
 	f->entry->data[f->pos++] = c;
@@ -53,10 +57,15 @@ int file_entry_write(stream_s *stream, unsigned char c)
 
 int file_entry_seek(stream_s *stream, long pos, int origin)
 {
+	UNUSED(origin);
 	file_entry_data *f = (file_entry_data *) stream->data;
 	f->pos = pos;
 	return 0;
 }
+
+/* file object */
+
+//static FILE* create_file(
 
 
 /*
@@ -65,7 +74,8 @@ int file_entry_seek(stream_s *stream, long pos, int origin)
 
 void clearerr(FILE *file)
 {
-	stream_puts(serialstream, "clearerr() called");
+	UNUSED(file);
+	stream_puts(serialout, "clearerr() called");
 	//[TODO]
 }
 
@@ -84,11 +94,13 @@ int feof(FILE *file)
 
 int ferror(FILE *file)
 {
+	UNUSED(file);
 	return 0;
 }
 
 int fflush(FILE *file)
 {
+	UNUSED(file);
 	return -1;
 }
 
@@ -96,7 +108,8 @@ int fgetpos(FILE *file, int *pos)
 {
 	if (file->stream == NULL)
 		return EOF;
-	return file->pos;
+	*pos = file->pos;
+	return 0;
 }
 
 FILE *fopen(const char *filename, const char *mode)
@@ -134,14 +147,15 @@ FILE *fopen(const char *filename, const char *mode)
 			
 			root[i] = (file_entry *) malloc(sizeof(file_entry));
 			strncpy((char *) &(root[i]->name), filename, 256);
-			root[i]->data = (unsigned char *) malloc(1024);
+			root[i]->data = NULL;
 			root[i]->size = 0;
 			root[i]->max = 1024;
 			
 			return fopen(filename, mode);
 		}
 	}
-	puts("ERROR: No file space left!");
+	puts("ERROR: Exceeded max of 256 files!");
+	return NULL;
 }
 
 size_t fread(void *ptr, size_t size, size_t nmemb, FILE *file)
@@ -158,77 +172,82 @@ size_t fread(void *ptr, size_t size, size_t nmemb, FILE *file)
 		}
 		if (a == EOF) break;
 	}
-	stream_puti(serialstream, size);
-	stream_puts(serialstream, " - ");
-	stream_puti(serialstream, nmemb);
-	stream_puts(serialstream, " fread() called\n");
+	stream_puti(serialout, size);
+	stream_puts(serialout, " - ");
+	stream_puti(serialout, nmemb);
+	stream_puts(serialout, " fread() called\n");
 	return i;
 }
 
 FILE *freopen(const char *filename, const char *mode, FILE *stream)
 {
-	stream_puts(serialstream, "freopen() called\n");
+	UNUSED(filename); UNUSED(mode); UNUSED(stream);
+	stream_puts(serialout, "freopen() called\n");
 	return NULL;
 }
 
 int fseek(FILE *file, long int offset, int whence)
 {
-	stream_puts(serialstream, "fseek() called\n");
+	stream_puts(serialout, "fseek() called\n");
 	file->stream->seek(file->stream, offset, whence);
 	return -1;
 }
 
 long int ftell(FILE *file)
 {
-	stream_puts(serialstream, "fteel() called\n");
-	return -1;
+	return file->pos;
 }
 
 size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *file)
 {
-	stream_puts(serialstream, "fwrite() called\n");
+	UNUSED(ptr); UNUSED(size); UNUSED(nmemb); UNUSED(file);
+	stream_puts(serialout, "fwrite() called\n");
 	return -1;
 }
 
 int remove(const char *filename)
 {
-	stream_puts(serialstream, "remove() called\n");
+	UNUSED(filename);
+	stream_puts(serialout, "remove() called\n");
 	return -1;
 }
 
 int rename(const char *old_filename, const char *new_filename)
 {
-	stream_puts(serialstream, "rename() called\n");
+	UNUSED(old_filename); UNUSED(new_filename);
+	stream_puts(serialout, "rename() called\n");
 	return -1;
 }
 
 void rewind(FILE *file)
 {
-	stream_puts(serialstream, "rewind() called\n");
-	return -1;
+	UNUSED(file);
+	stream_puts(serialout, "rewind() called\n");
 }
 
 void setbuf(FILE *stream, char *buffer)
 {
-	stream_puts(serialstream, "setbuf() called\n");
-	return -1;
+	UNUSED(stream); UNUSED(buffer);
+	stream_puts(serialout, "setbuf() called\n");
 }
 
 int setvbuf(FILE *stream, char *buffer, int mode, size_t size)
 {
-	stream_puts(serialstream, "setvbuf() called\n");
+	UNUSED(stream); UNUSED(buffer); UNUSED(mode); UNUSED(size);
+	stream_puts(serialout, "setvbuf() called\n");
 	return -1;
 }
 
 FILE *tmpfile(void)
 {
-	stream_puts(serialstream, "tmpfile() called\n");
+	stream_puts(serialout, "tmpfile() called\n");
 	return NULL;
 }
 
 char *tmpnam(char *str)
 {
-	stream_puts(serialstream, "tmpnam() called\n");
+	UNUSED(str);
+	stream_puts(serialout, "tmpnam() called\n");
 	return NULL;
 }
 
@@ -238,43 +257,49 @@ char *tmpnam(char *str)
  
 int fprintf(FILE *stream, const char *format, ...)
 {
-	stream_puts(serialstream, "fprintf() called\n");
+	UNUSED(stream); UNUSED(format);
+	stream_puts(serialout, "fprintf() called\n");
 	return -1;
 }
 
 int printf(const char *format, ...)
 {
-	stream_puts(serialstream, "printf() called\n");
+	UNUSED(format);
+	stream_puts(serialout, "printf() called\n");
 	return -1;
 }
 
 int sprintf(char *str, const char *format, ...)
 {
+	UNUSED(str); UNUSED(format);
 	str[0] = '1';
 	str[1] = '0';
 	str[2] = '.';
-	str[3] = '1';
+	str[3] = '0';
 	str[4] = '\0';
-	stream_puts(serialstream, format);
-	stream_puts(serialstream, " sprintf() called\n");
+	stream_puts(serialout, format);
+	stream_puts(serialout, " sprintf() called\n");
 	return 1;
 }
 
 int vfprintf(FILE *stream, const char *format, va_list arg)
 {
-	stream_puts(serialstream, "vprintf() called\n");
+	UNUSED(stream); UNUSED(format); UNUSED(arg);
+	stream_puts(serialout, "vprintf() called\n");
 	return -1;
 }
 
 int vprintf(const char *format, va_list arg)
 {
-	stream_puts(serialstream, "vprintf() called\n");
+	UNUSED(format); UNUSED(arg);
+	stream_puts(serialout, "vprintf() called\n");
 	return -1;
 }
 
 int vsprintf(char *str, const char *format, va_list arg)
 {
-	stream_puts(serialstream, "vsprintf() called\n");
+	UNUSED(str); UNUSED(format); UNUSED(arg);
+	stream_puts(serialout, "vsprintf() called\n");
 	return -1;
 }
 
@@ -284,19 +309,22 @@ int vsprintf(char *str, const char *format, va_list arg)
  
 int fscanf(FILE *stream, const char *format, ...)
 {
-	stream_puts(serialstream, "fscanf() called\n");
+	UNUSED(stream); UNUSED(format);
+	stream_puts(serialout, "fscanf() called\n");
 	return -1;
 }
 
 int scanf(const char *format, ...)
 {
-	stream_puts(serialstream, "scanf() called\n");
+	UNUSED(format);
+	stream_puts(serialout, "scanf() called\n");
 	return -1;
 }
 
 int sscanf(const char *str, const char *format, ...)
 {
-	stream_puts(serialstream, "sscanf() called\n");
+	UNUSED(str); UNUSED(format);
+	stream_puts(serialout, "sscanf() called\n");
 	return -1;
 }
 
@@ -366,7 +394,7 @@ int ungetc(int c, FILE *file)
  * standard streams
  */
 
-FILE fstdout = { NULL, 0L, 0, 0, NULL, 0, '\0' };
+FILE fstdout = { NULL, 0L, 0, 0, NULL, 0, 0, '\0' };
 FILE *stdout = &fstdout;
 FILE *stdin;
 FILE *stderr;

@@ -1,3 +1,4 @@
+#include <common.h>
 #include <stdlib.h>
 #include <stream.h>
 #include <system.h>
@@ -35,8 +36,7 @@ void* malloc(unsigned nbytes) {
     nunits = (nbytes+sizeof(Header)-1)/sizeof(Header) + 1;
 
     if ((prevp = freep) == NULL) {	/* no free list yet */
-		base.s.ptr = freep = prevp = &base;
-		base.s.size = 0;
+		base.s.ptr = freep = prevp = &base;		base.s.size = 0;
     }
     for (p = prevp->s.ptr; ; prevp = p, p = p->s.ptr) {
 		if (p->s.size >= nunits) {	/* big enough */
@@ -62,6 +62,7 @@ void* malloc(unsigned nbytes) {
 static int first = 1;
 
 char *sbrk(int nbytes) {
+	UNUSED(nbytes);
 	if (first == 0) {
 		puts("\nREQUESTING MEMORY WHERE THERE IS NONE\n");
 		return NULL;

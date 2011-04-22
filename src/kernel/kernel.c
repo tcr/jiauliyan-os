@@ -1,3 +1,4 @@
+#include <common.h>
 #include <system.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,6 +8,7 @@
 #include <vga.h>
 #include <serial.h>
 #include <keyboard.h>
+#include <timer.h>
 
 #include "../../lua-5.1/src/lua.h"
 #include "../../lua-5.1/src/lualib.h"
@@ -49,7 +51,7 @@ void kernel_start()
 	putchar('\n');
 
 	puts("Writing to serial port...\n");
-	stream_puts(serialstream, "[SERIAL] Testing serial ports from Jiauliyan OS!\n");
+	stream_puts(serialout, "[SERIAL] Testing serial ports from Jiauliyan OS!\n");
 
 	/*
 	puts("Waiting timer for 100 clicks:\n");
@@ -75,6 +77,7 @@ void kernel_start()
     vga_setfg(WHITE);
     
 	int size = (int)&_binary_os_lua_size;
+	UNUSED(size);
     char *data = (char *)&_binary_os_lua_start;
     
     puts(data);

@@ -6,6 +6,7 @@
 extern void serial_install();
 extern void serial_set_handler(void (*callback)(unsigned char *buf, long int size));
 extern void serial_flush();
-extern stream_s *serialstream;
+extern stream_s *serialout;
+extern stream_s *serialin;
 
 #endif

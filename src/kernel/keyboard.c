@@ -111,16 +111,6 @@ void keyboard_interrupt(struct regs *r)
 }
 
 /*
- * install
- */
-
-void keyboard_install()
-{
-    // installs keyboard interrupt handler to IRQ1
-    irq_install_handler(1, keyboard_interrupt);
-}
-
-/*
  * keyboard stream implementation
  */
 
@@ -136,7 +126,17 @@ int keyboardstream_read(stream_s *stream)
 	return c;
 }
 
-stream_s keyboardstream_s = { keyboardstream_read, stream_no_write, stream_no_seek, NULL };
-stream_s *keyboardstream = &keyboardstream_s;
+stream_s *keyboardstream;
 
+/*
+ * install
+ */
 
+void keyboard_install()
+{
+    // installs keyboard interrupt handler to IRQ1
+    irq_install_handler(1, keyboard_interrupt);
+    
+    // create keyboard stream
+    keyboardstream = stream_create(keyboardstream_read, stream_no_write, stream_no_seek, NULL);
+}

@@ -20,7 +20,14 @@ typedef struct __stream {
 	int (*write)(struct __stream *stream, unsigned char s); // returns EOF on error, otherwise (int) s
 	int (*seek)(struct __stream *stream, long pos, int whence); // seeks to position
 	void *data; // data object
+	int ferr;
 } stream_s;
+
+extern stream_s *stream_create(
+	int (*read)(struct __stream *stream),
+	int (*write)(struct __stream *stream, unsigned char s),
+	int (*seek)(struct __stream *stream, long pos, int whence),
+	void *data);
 
 extern int stream_no_read(stream_s *stream);
 extern int stream_no_write(stream_s *stream, unsigned char s);

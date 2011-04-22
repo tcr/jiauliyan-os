@@ -294,13 +294,12 @@ char *strstr(const char *s1, const char *s2)
 
     while (l1 >= l2) {
         if (strcmp(s1, s2) != 0) {
-            return s1;
+            return (char *) s1;
         }
         s1++;
         l1--;
     }
     return 0;
-
 }
 
 char * strtok_r(char *s, const char *delim, char **last)

@@ -145,14 +145,6 @@ void vga_setfg(unsigned char fg)
 	// lower nibble is fg
 	attrib = (attrib & 0xF0) | (fg & 0x0F);
 }
-
-/* Sets our text-mode VGA pointer, then clears the screen for us */
-void vga_init(void)
-{
-	textmemptr = (unsigned short *)0xB8000;
-	vga_cls();
-}
-
 /*
  * vga stream implementation
  */
@@ -176,5 +168,17 @@ int vgastream_seek(stream_s *stream, long pos, int origin)
 	return 0;
 }
 
-stream_s vgastream_s = { vgastream_read, vgastream_write, vgastream_seek, NULL };
-stream_s *vgastream = &vgastream_s;
+stream_s *vgastream;
+
+/*
+ * initalize vga
+ */
+void vga_init(void)
+{
+	// set text mem pointer, then clear screen
+	textmemptr = (unsigned short *)0xB8000;
+	vga_cls();
+	
+	// initialize vga stream
+	vgastream = stream_create(vgastream_read, vgastream_write, vgastream_seek, NULL);
+}

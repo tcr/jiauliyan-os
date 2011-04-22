@@ -1,5 +1,30 @@
 #include <stream.h>
 #include <string.h>
+#include <stdlib.h>
+
+/*
+ * stream initializer
+ */
+
+stream_s *stream_create(
+	int (*read)(stream_s *stream),
+	int (*write)(stream_s *stream, unsigned char s),
+	int (*seek)(stream_s *stream, long pos, int whence),
+	void *data)
+{
+	stream_s *s = (stream_s *) malloc(sizeof(stream_s));
+	s->read = read;
+	s->write = write;
+	s->seek = seek;
+	s->data = data;
+	s->ferr = 0;
+	return s;
+}
+
+void stream_destroy(stream_s *stream)
+{
+	free(stream);
+}
 
 /*
  * stream impl dummies
