@@ -11,6 +11,7 @@
 
 #include <errno.h>
 #include <limits.h>
+#include <ctype.h>
 
 sighandler_t signal(int signum, sighandler_t handler)
 {
