@@ -79,8 +79,7 @@ int fclose(FILE *file)
 
 int feof(FILE *file)
 {
-	puts("feof called.\n");
-	return 0;
+	return file->eof;
 }
 
 int ferror(FILE *file)
@@ -95,7 +94,7 @@ int fflush(FILE *file)
 
 int fgetpos(FILE *file, int *pos)
 {
-	if (file == NULL)
+	if (file->stream == NULL)
 		return EOF;
 	return file->pos;
 }
@@ -124,6 +123,7 @@ FILE *fopen(const char *filename, const char *mode)
 			file->istemp = 0;
 			file->buffer = NULL;
 			file->bsize = 0;
+			file->eof = 0;
 			file->hold = 0;
 			return file;
 		}
@@ -250,9 +250,13 @@ int printf(const char *format, ...)
 
 int sprintf(char *str, const char *format, ...)
 {
-	str[0] = '#';
-	str[1] = '\0';
-	stream_puts(serialstream, "sprintf() called\n");
+	str[0] = '1';
+	str[1] = '0';
+	str[2] = '.';
+	str[3] = '1';
+	str[4] = '\0';
+	stream_puts(serialstream, format);
+	stream_puts(serialstream, " sprintf() called\n");
 	return 1;
 }
 
@@ -304,10 +308,18 @@ int fgetc(FILE *file)
 {
 	if (file->stream == NULL)
 		return EOF;
+	if (file->hold != EOF) {
+		file->pos++;
+		int hold = file->hold;
+		file->hold = EOF;
+		return hold;
+	}
 		
-	stream_puts(serialstream, "fgetc() called\n");
 	file->pos++;
-	return file->stream->read(file->stream);
+	int a = file->stream->read(file->stream);
+	if (a == EOF)
+		file->eof = 1;
+	return a;
 }
 
 char *fgets(char *str, int n, FILE *file)
@@ -343,10 +355,11 @@ int fputs(const char *string, FILE *file)
 
 int ungetc(int c, FILE *file)
 {
-	stream_puts(serialstream, "ungetc() called\n");
-	fseek(file, 0, 0);
-	//[TODO]
-	return EOF;
+	if (file->hold != EOF || c == EOF)
+		return EOF;
+	file->pos--;
+	file->hold = c;
+	return c;
 }
 
 /*
