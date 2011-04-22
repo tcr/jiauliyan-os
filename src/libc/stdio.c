@@ -4,6 +4,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <vga.h>
+#include <stdint.h>
  
  #include <stream.h>
  #include <serial.h>
@@ -250,6 +251,7 @@ int printf(const char *format, ...)
 
 int sprintf(char *str, const char *format, ...)
 {
+	/*
 	str[0] = '1';
 	str[1] = '0';
 	str[2] = '.';
@@ -258,6 +260,15 @@ int sprintf(char *str, const char *format, ...)
 	stream_puts(serialstream, format);
 	stream_puts(serialstream, " sprintf() called\n");
 	return 1;
+	*/
+	va_list ap;
+	int ret;
+
+	va_start(ap, format);
+	ret = vsprintf(str, format, ap);
+	va_end(ap);
+
+	return ret;
 }
 
 int vfprintf(FILE *stream, const char *format, va_list arg)
@@ -271,11 +282,40 @@ int vprintf(const char *format, va_list arg)
 	stream_puts(serialstream, "vprintf() called\n");
 	return -1;
 }
-
+/*
 int vsprintf(char *str, const char *format, va_list arg)
 {
 	stream_puts(serialstream, "vsprintf() called\n");
 	return -1;
+	
+	
+}*/
+
+int vsprintf(char *str, const char *format, va_list ap) {
+	size_t i;
+	const char *format_tmp;
+	char m[2];
+	char *string;
+
+	strcpy(str, "");
+	m[1] = '\0';
+
+	for (i = 0; format[i]; i++) {
+		if (format[i] == '%') {
+			format_tmp = &format[i];
+			string = __format(&format_tmp, &ap);
+			i = (uintptr_t) format_tmp - (uintptr_t) format;
+			if (!string) continue;
+			strcat(str, string);
+			free(string);
+		}
+		else {
+			m[0] = format[i];
+			strcat(str, m);
+		}
+	}
+
+	return i;
 }
 
 /*
