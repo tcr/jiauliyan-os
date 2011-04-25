@@ -47,7 +47,7 @@ void kernel_start()
 	puts("An OS by some cool dudes\n\n");
 
 	puts("Address of kernel_start(): ");
-	stream_putp(vgastream, &kernel_start);
+	stream_putp(vgaout, &kernel_start);
 	putchar('\n');
 
 	puts("Writing to serial port...\n");
@@ -58,18 +58,6 @@ void kernel_start()
 	timer_wait(100);	
 	puts("100 click timer DONE!\n");
 	putchar('\n');
-	*/
-	
-	/*
-	puts("Testing input. Serial input is ");
-	vga_setfg(LIGHT_RED);
-	puts("red");
-	vga_setfg(WHITE);
-	puts(" and keyboard input is ");
-	vga_setfg(LIGHT_GREEN);
-	puts("green");
-	vga_setfg(WHITE);
-	puts(".\n");
 	*/
 	
 	vga_setfg(LIGHT_BROWN);
@@ -116,7 +104,18 @@ void kernel_start()
 /***************************/
 
 	vga_setfg(LIGHT_GREEN);
-	puts("\nLua execution finished.");
+	puts("\nLua execution finished.\n\n");
+	
+	vga_setfg(WHITE);
+	puts("Testing input. Serial input is ");
+	vga_setfg(LIGHT_RED);
+	puts("red");
+	vga_setfg(WHITE);
+	puts(" and keyboard input is ");
+	vga_setfg(LIGHT_GREEN);
+	puts("green");
+	vga_setfg(WHITE);
+	puts(".\n");
 
 	/* Write your kernel here. */
 	for(;;) {

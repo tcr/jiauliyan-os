@@ -14,14 +14,14 @@
  */
 
 stream_s *stream_create(
-	int (*read)(stream_s *stream),
-	int (*write)(stream_s *stream, unsigned char s),
+	int (*get)(stream_s *stream),
+	int (*put)(stream_s *stream, unsigned char s),
 	int (*seek)(stream_s *stream, long pos, int whence),
 	void *data)
 {
 	stream_s *s = (stream_s *) malloc(sizeof(stream_s));
-	s->read = read;
-	s->write = write;
+	s->get = get;
+	s->put = put;
 	s->seek = seek;
 	s->data = data;
 	s->ferr = 0;
@@ -37,13 +37,13 @@ void stream_destroy(stream_s *stream)
  * stream impl dummies
  */
 
-int stream_no_read(stream_s *stream)
+int stream_no_get(stream_s *stream)
 {
 	(void) stream;
 	return EOF;
 }
 
-int stream_no_write(stream_s *stream, unsigned char s)
+int stream_no_put(stream_s *stream, unsigned char s)
 {
 	(void) stream; (void) s;
 	return EOF;
@@ -646,7 +646,7 @@ size_t stream_write(stream_s *stream, const void *ptr, size_t size)
 	unsigned char *p = (unsigned char *) ptr;
 	size_t i;
 	for (i = 0; i < size; i++) {
-		if (stream->write(stream, *p) == EOF)
+		if (stream->put(stream, *p) == EOF)
 			break;
 		p++;
 	}
@@ -755,7 +755,7 @@ typedef struct {
 
 /* bytestream impl */
 
-static int bytestream_read(stream_s *stream)
+static int bytestream_get(stream_s *stream)
 {
 	bytestream_s *data = (bytestream_s *) stream->data;
 	if (data->pos >= data->size)
@@ -763,7 +763,7 @@ static int bytestream_read(stream_s *stream)
 	return data->buf[data->pos++];
 }
 
-static int bytestream_write(stream_s *stream, unsigned char c)
+static int bytestream_put(stream_s *stream, unsigned char c)
 {
 	bytestream_s *data = (bytestream_s *) stream->data;
 	
@@ -797,8 +797,8 @@ stream_s *bytestream_create(long int capacity)
 	data->capacity = capacity;
 	data->pos = 0;
 	stream_s *stream = malloc(sizeof(stream_s));
-	stream->read = bytestream_read;
-	stream->write = bytestream_write;
+	stream->get = bytestream_get;
+	stream->put = bytestream_put;
 	stream->seek = bytestream_seek;
 	stream->data = data;
 	return stream;

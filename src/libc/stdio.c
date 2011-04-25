@@ -33,7 +33,7 @@ typedef struct {
 
 /* file entry data stream */
 
-int file_entry_read(stream_s *stream)
+int file_entry_get(stream_s *stream)
 {
 	file_entry_data *f = (file_entry_data *) stream->data;
 	if (f->pos >= f->entry->size)
@@ -41,7 +41,7 @@ int file_entry_read(stream_s *stream)
 	return f->entry->data[f->pos++];
 }
 
-int file_entry_write(stream_s *stream, unsigned char c)
+int file_entry_put(stream_s *stream, unsigned char c)
 {
 	file_entry_data *f = (file_entry_data *) stream->data;
 	
@@ -96,8 +96,7 @@ int feof(FILE *file)
 
 int ferror(FILE *file)
 {
-	UNUSED(file);
-	return 0;
+	return file->stream->ferr;
 }
 
 int fflush(FILE *file)
@@ -126,8 +125,8 @@ FILE *fopen(const char *filename, const char *mode)
 			data->pos = 0;
 			
 			stream_s *stream = (stream_s *) malloc(sizeof(stream_s));
-			stream->read = file_entry_read;
-			stream->write = file_entry_write;
+			stream->get = file_entry_get;
+			stream->put = file_entry_put;
 			stream->seek = file_entry_seek;
 			stream->data = data;
 			
@@ -168,7 +167,7 @@ size_t fread(void *ptr, size_t size, size_t nmemb, FILE *file)
 	int a;
 	for (i = 0; i < nmemb; i++) {
 		for (j = 0; j < size; j++) {
-			a = file->stream->read(file->stream);
+			a = file->stream->get(file->stream);
 			if (a == EOF) break;
 			p[i*size + j] = (unsigned char) a;
 		}
@@ -371,7 +370,7 @@ int fgetc(FILE *file)
 	}
 		
 	file->pos++;
-	int a = file->stream->read(file->stream);
+	int a = file->stream->get(file->stream);
 	if (a == EOF)
 		file->eof = 1;
 	return a;
@@ -442,5 +441,5 @@ FILE *stderr = &fstdout; // [TODO] change this
 
 void stdio_init()
 {
-	fstdout.stream = vgastream;
+	fstdout.stream = vgaout;
 }

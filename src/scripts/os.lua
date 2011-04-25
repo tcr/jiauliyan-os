@@ -1,11 +1,13 @@
-print("Launched Lua kernel.")
+print("Init Lua kernel.")
 
 function foo()
-	print("Let's assume a kernel were running here. Wheeeee!")
+	print("Lua kernel start.")
 	
-	for i = 1, 5 do
-		print(i)
-    end
-    
-    print("Apples " .. 45 .. " pears")
+	--[[
+	local answer
+	repeat
+		io.write("continue with this operation (y/n)? ")
+		io.flush()
+		answer=io.read()
+	until answer=="y" or answer=="n"]]
 end

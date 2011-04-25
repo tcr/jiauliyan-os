@@ -22,13 +22,13 @@ int serial_transit_empty()
    return inportb(PORT + 5) & 0x20;
 }
  
-unsigned char serial_read()
+unsigned char serial_get()
 {
    while (serial_received() == 0);
    return inportb(PORT);
 }
  
-void serial_write(unsigned char a)
+void serial_put(unsigned char a)
 {
    while (serial_transit_empty() == 0); 
    outportb(PORT, a);
@@ -63,17 +63,17 @@ void serial_interrupt(struct regs *r)
 	UNUSED(r);
 	
 	if (serial_received()) {
-		serial_buf[serial_buf_len++] = serial_read();
+		serial_buf[serial_buf_len++] = serial_get();
 		if (serial_buf_len == SERIAL_BUF_SIZE)
 			serial_flush();
 	}
 }
 
 /*
- * serial stream implementation
+ * serial in implementation
  */
 
-int serialin_read(stream_s *stream)
+int serialin_get(stream_s *stream)
 {
 	UNUSED(stream);
 	
@@ -85,11 +85,11 @@ int serialin_read(stream_s *stream)
 	return c;
 }
 
-int serialout_write(stream_s *stream, unsigned char c)
+int serialout_put(stream_s *stream, unsigned char c)
 {
 	UNUSED(stream);
 	
-	serial_write((char) c);
+	serial_put((char) c);
 	return (int) c;
 }
 
@@ -114,6 +114,6 @@ void serial_install()
 	irq_install_handler(4, serial_interrupt);
 	
 	// create streams
-	serialout = stream_create(stream_no_read, serialout_write, stream_no_seek, NULL);
-	serialin = stream_create(serialin_read, stream_no_write, stream_no_seek, NULL);
+	serialout = stream_create(stream_no_get, serialout_put, stream_no_seek, NULL);
+	serialin = stream_create(serialin_get, stream_no_put, stream_no_seek, NULL);
 }

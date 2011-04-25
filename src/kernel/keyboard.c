@@ -114,19 +114,18 @@ void keyboard_interrupt(struct regs *r)
  * keyboard stream implementation
  */
 
-int keyboardstream_read(stream_s *stream)
+int keyboardin_get(stream_s *stream)
 {
 	(void) stream;
 	
 	// read from serial buffer
-	if (keyboard_buf_len == 0)
-		return EOF;
+	while (keyboard_buf_len == 0) { ; }
 	unsigned char c = keyboard_buf[0];
 	memcpy(keyboard_buf, keyboard_buf + 1, --keyboard_buf_len);
 	return c;
 }
 
-stream_s *keyboardstream;
+stream_s *keyboardin;
 
 /*
  * install
@@ -138,5 +137,5 @@ void keyboard_install()
     irq_install_handler(1, keyboard_interrupt);
     
     // create keyboard stream
-    keyboardstream = stream_create(keyboardstream_read, stream_no_write, stream_no_seek, NULL);
+    keyboardin = stream_create(keyboardin_get, stream_no_put, stream_no_seek, NULL);
 }

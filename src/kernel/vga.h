@@ -9,7 +9,7 @@ extern void vga_setbg(unsigned char bg);
 extern void vga_setfg(unsigned char fg);
 extern void vga_init();
 
-extern stream_s *vgastream;
+extern stream_s *vgaout;
 
 #define BLACK 0
 #define BLUE 1

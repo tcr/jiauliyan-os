@@ -17,27 +17,28 @@
 #define BUFSIZ 1024
 
 typedef struct __stream {
-	int (*read)(struct __stream *stream); // reads a character
-	int (*write)(struct __stream *stream, unsigned char s); // returns EOF on error, otherwise (int) s
+	int (*get)(struct __stream *stream); // reads a character
+	int (*put)(struct __stream *stream, unsigned char s); // returns EOF on error, otherwise (int) s
 	int (*seek)(struct __stream *stream, long pos, int whence); // seeks to position
 	void *data; // data object
 	int ferr;
 } stream_s;
 
 extern stream_s *stream_create(
-	int (*read)(struct __stream *stream),
-	int (*write)(struct __stream *stream, unsigned char s),
+	int (*get)(struct __stream *stream),
+	int (*put)(struct __stream *stream, unsigned char s),
 	int (*seek)(struct __stream *stream, long pos, int whence),
 	void *data);
 
-extern int stream_no_read(stream_s *stream);
-extern int stream_no_write(stream_s *stream, unsigned char s);
+extern int stream_no_get(stream_s *stream);
+extern int stream_no_put(stream_s *stream, unsigned char s);
 extern int stream_no_seek(stream_s *stream, long pos, int whence);
 
 extern int stream_format(stream_s *stream, const char *format, ...);
 extern int stream_vformat(stream_s *stream, const char *format, va_list ap);
 
-#define stream_putc(S, C) S->write(S, (char) C)
+#define stream_putb(S, C) S->put(S, (unsigned char) C)
+#define stream_putc(S, C) S->put(S, (char) C)
 extern size_t stream_puts(stream_s *stream, const char *str);
 extern void stream_puti(stream_s *stream, unsigned int i);
 extern void stream_puthc(stream_s *stream, unsigned char c);

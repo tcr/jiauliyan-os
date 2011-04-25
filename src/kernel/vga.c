@@ -148,27 +148,14 @@ void vga_setfg(unsigned char fg)
 /*
  * vga stream implementation
  */
-
-int vgastream_read(stream_s *stream)
-{
-	(void) stream;
-	return EOF;
-}
-
-int vgastream_write(stream_s *stream, unsigned char c)
+int vgaout_put(stream_s *stream, unsigned char c)
 {
 	(void) stream;
 	vga_putchar((char) c);
 	return (int) c;
 }
 
-int vgastream_seek(stream_s *stream, long pos, int origin)
-{
-	(void) stream; (void) pos; (void) origin;
-	return 0;
-}
-
-stream_s *vgastream;
+stream_s *vgaout;
 
 /*
  * initalize vga
@@ -180,5 +167,5 @@ void vga_init(void)
 	vga_cls();
 	
 	// initialize vga stream
-	vgastream = stream_create(vgastream_read, vgastream_write, vgastream_seek, NULL);
+	vgaout = stream_create(stream_no_get, vgaout_put, stream_no_seek, NULL);
 }
