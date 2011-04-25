@@ -416,7 +416,7 @@ char *strerror(int errnum)
 	return error_strs[0];
 }
 
-int strlen(const char *str)
+size_t strlen(const char *str)
 {
     /* This loops through character array 'str', returning how
     *  many characters it needs to check before it finds a 0.

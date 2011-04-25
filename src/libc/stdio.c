@@ -4,9 +4,11 @@
 #include <stream.h>
 #include <stdarg.h>
 #include <string.h>
-#include <vga.h>
+#include <stdint.h>
+#include <errno.h>
 
 #include <stream.h>
+#include <vga.h>
 #include <serial.h>
 
 // http://www.acm.uiuc.edu/webmonkeys/book/c_guide/2.12.html#streams
@@ -257,20 +259,31 @@ char *tmpnam(char *str)
  
 int fprintf(FILE *stream, const char *format, ...)
 {
-	UNUSED(stream); UNUSED(format);
-	stream_puts(serialout, "fprintf() called\n");
-	return -1;
+	va_list ap;
+	int ret;
+
+	va_start(ap, format);
+	ret = vfprintf(stream, format, ap);
+	va_end(ap);
+
+	return ret;
 }
 
 int printf(const char *format, ...)
 {
-	UNUSED(format);
-	stream_puts(serialout, "printf() called\n");
-	return -1;
+	va_list ap;
+	int ret;
+
+	va_start(ap, format);
+	ret = vfprintf(stdout, format, ap);
+	va_end(ap);
+
+	return ret;
 }
 
 int sprintf(char *str, const char *format, ...)
 {
+	/*
 	UNUSED(str); UNUSED(format);
 	str[0] = '1';
 	str[1] = '0';
@@ -280,27 +293,41 @@ int sprintf(char *str, const char *format, ...)
 	stream_puts(serialout, format);
 	stream_puts(serialout, " sprintf() called\n");
 	return 1;
+	*/
+
+	va_list ap;
+	int ret;
+
+	va_start(ap, format);
+	ret = vsprintf(str, format, ap);
+	va_end(ap);
+
+	return ret;
 }
 
-int vfprintf(FILE *stream, const char *format, va_list arg)
+int vfprintf(FILE *file, const char *format, va_list arg)
 {
-	UNUSED(stream); UNUSED(format); UNUSED(arg);
-	stream_puts(serialout, "vprintf() called\n");
-	return -1;
+	if (!file)
+		return -1;
+	return stream_vformat(file->stream, format, arg);
 }
 
 int vprintf(const char *format, va_list arg)
 {
-	UNUSED(format); UNUSED(arg);
-	stream_puts(serialout, "vprintf() called\n");
-	return -1;
+	return vfprintf(stdout, format, arg);
 }
 
 int vsprintf(char *str, const char *format, va_list arg)
 {
-	UNUSED(str); UNUSED(format); UNUSED(arg);
-	stream_puts(serialout, "vsprintf() called\n");
-	return -1;
+	stream_s *bs = bytestream_create(1024);
+	int ret = stream_vformat(bs, format, arg);
+	if (ret >= 0) {
+		stream_putc(bs, '\0');
+		unsigned char *bs_str = bytestream_data(bs);
+		strncpy(str, (char *) bs_str, (size_t) bytestream_size(bs));
+	}
+	bytestream_destroy(bs);
+	return ret;
 }
 
 /*
@@ -391,13 +418,27 @@ int ungetc(int c, FILE *file)
 }
 
 /*
+ * error functions
+ */
+ 
+void perror(const char *s)
+{
+	if (errno) {
+		if (s)
+			fprintf(stderr, "%s: %s\n", s, strerror(errno));
+		else
+			fprintf(stderr, "%s\n", strerror(errno));
+	}
+}
+
+/*
  * standard streams
  */
 
 FILE fstdout = { NULL, 0L, 0, 0, NULL, 0, 0, '\0' };
 FILE *stdout = &fstdout;
 FILE *stdin;
-FILE *stderr;
+FILE *stderr = &fstdout; // [TODO] change this
 
 void stdio_init()
 {

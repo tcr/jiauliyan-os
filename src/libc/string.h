@@ -35,6 +35,6 @@ extern char *strtok(char *str1, const char *str2);
 extern void *memsetw(void *dest, short int val, int count);
 extern void *memset(void *dest, int val, int count);
 extern char *strerror(int errnum);
-extern int strlen(const char *str);
+extern size_t strlen(const char *str);
 
 #endif

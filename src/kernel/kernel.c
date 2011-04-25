@@ -82,36 +82,41 @@ void kernel_start()
     
     puts(data);
 	
-	FILE *f = fopen("hello.lua", "w");
+	FILE *f = fopen("os.lua", "w");
 	fputs(data, f);
 	fclose(f);
 	
 	vga_setfg(LIGHT_BROWN);
-    puts("\nRunning lua:\n\n");
+    puts("\n\nRunning lua:\n\n");
     vga_setfg(WHITE);
+    
+/***************************/
 	
 	lua_State* l;
 	int dofile;
-	/* initialize lua */
+	// initialize lua
 	l = lua_open();
-	/* load lua libraries */
+	// load lua libraries
 	luaL_openlibs(l);
-	//// run the hello.lua script 
-	dofile = luaL_dofile(l, "hello.lua");
+	
+	// run the hello.lua script 
+	dofile = luaL_dofile(l, "os.lua");
+	
 	if (dofile == 0) {
 		// call foo
 		lua_getglobal(l,"foo");
 		lua_call(l,0,0);
 	} else {
-		
-	stream_puts(vgastream, "Error: ");
-	stream_puti(vgastream, dofile);
-		puts( "\nError, unable to run hello.lua\n");
+		perror("Unable to run os.lua");
 	}
+	
 	// cleanup Lua
 	lua_close(l);
+	
+/***************************/
+
 	vga_setfg(LIGHT_GREEN);
-	puts("\nDone with lua");
+	puts("\nLua execution finished.");
 
 	/* Write your kernel here. */
 	for(;;) {

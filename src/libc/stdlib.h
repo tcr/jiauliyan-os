@@ -8,6 +8,9 @@
 #define EXIT_FAILURE 1
 #define EXIT_SUCCESS 0
 
+/* utility */
+extern int atoi(const char *nptr);
+
 /* environment functions */
 extern char *getenv(const char *name);
 extern void exit(int exit_code);

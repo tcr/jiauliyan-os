@@ -10,4 +10,6 @@ extern int errno;
 // illegal character sequence, eg wcstombs(str, L"\xffff", 2)
 #define EILSEQ 3
 
+#define ENOMEM 4
+
 #endif

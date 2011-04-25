@@ -22,10 +22,7 @@ typedef struct {
 	int hold;				// ungetc char if no buffer
 } FILE;
 
-/*
- * file functions
- */
-
+/* file functions */
 extern void clearerr(FILE *file);
 extern int fclose(FILE *file);
 extern int feof(FILE *file);
@@ -46,10 +43,7 @@ extern int setvbuf(FILE *stream, char *buffer, int mode, size_t size);
 extern FILE *tmpfile(void);
 extern char *tmpnam(char *str);
 
-/*
- * formatted I/O
- */
- 
+/* formatted I/O */
 extern int fprintf(FILE *stream, const char *format, ...);
 extern int printf(const char *format, ...);
 extern int sprintf(char *str, const char *format, ...);
@@ -57,18 +51,12 @@ extern int vfprintf(FILE *stream, const char *format, va_list arg);
 extern int vprintf(const char *format, va_list arg);
 extern int vsprintf(char *str, const char *format, va_list arg);
 
-/*
- * parse I/O
- */
- 
+/* parse I/O */ 
 extern int fscanf(FILE *stream, const char *format, ...);
 extern int scanf(const char *format, ...);
 extern int sscanf(const char *str, const char *format, ...);
 
-/*
- * character I/O
- */
- 
+/* character I/O */
 extern int fgetc(FILE *file);
 #define getc(S) fgetc(S)
 #define getchar() fgetc(stdin)
@@ -83,14 +71,13 @@ extern int fputs(const char *str, FILE *file);
 
 extern int ungetc(int c, FILE *file);
 
-/*
- * standard streams
- */
+/* error functions */
+extern void perror(const char *str);
 
+/* standard streams */
 extern FILE *stdout;
 extern FILE *stdin;
 extern FILE *stderr;
-
 extern void stdio_init();
 
 #endif

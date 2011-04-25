@@ -2,6 +2,7 @@
 #define __STREAM_H
 
 #include <stddef.h>
+#include <stdarg.h>
 
 #define EOF -1
 
@@ -33,10 +34,19 @@ extern int stream_no_read(stream_s *stream);
 extern int stream_no_write(stream_s *stream, unsigned char s);
 extern int stream_no_seek(stream_s *stream, long pos, int whence);
 
+extern int stream_format(stream_s *stream, const char *format, ...);
+extern int stream_vformat(stream_s *stream, const char *format, va_list ap);
+
 #define stream_putc(S, C) S->write(S, (char) C)
 extern size_t stream_puts(stream_s *stream, const char *str);
 extern void stream_puti(stream_s *stream, unsigned int i);
 extern void stream_puthc(stream_s *stream, unsigned char c);
 extern void stream_putp(stream_s *stream, void *p);
+
+/* bytestream */
+extern stream_s *bytestream_create(long int capacity);
+extern void bytestream_destroy(stream_s *stream);
+extern long int bytestream_size(stream_s *stream);
+extern unsigned char *bytestream_data(stream_s *stream);
 
 #endif

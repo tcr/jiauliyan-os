@@ -15,6 +15,7 @@
 #include <ctype.h>
 #include <math.h>
 #include <float.h>
+#include <string.h>
 
 sighandler_t signal(int signum, sighandler_t handler)
 {
@@ -36,7 +37,8 @@ void exit(int exit_code)
 {
 	UNUSED(exit_code);
 	stream_puts(serialout, "exit() called.\n");
-	puts("\nEXITING\n");
+	printf("\n[EXIT] %s", strerror(exit_code));
+	while(1);
 }
 
 int system(const char *string)
