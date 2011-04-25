@@ -16,12 +16,14 @@
 stream_s *stream_create(
 	int (*get)(stream_s *stream),
 	int (*put)(stream_s *stream, unsigned char s),
+	long int (*avail)(struct __stream *stream),
 	int (*seek)(stream_s *stream, long pos, int whence),
 	void *data)
 {
 	stream_s *s = (stream_s *) malloc(sizeof(stream_s));
 	s->get = get;
 	s->put = put;
+	s->avail = avail;
 	s->seek = seek;
 	s->data = data;
 	s->ferr = 0;
@@ -47,6 +49,12 @@ int stream_no_put(stream_s *stream, unsigned char s)
 {
 	(void) stream; (void) s;
 	return EOF;
+}
+
+long int stream_no_avail(stream_s *stream)
+{
+	(void) stream;
+	return 0;
 }
 
 int stream_no_seek(stream_s *stream, long pos, int whence)

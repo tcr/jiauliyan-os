@@ -19,6 +19,7 @@
 typedef struct __stream {
 	int (*get)(struct __stream *stream); // reads a character
 	int (*put)(struct __stream *stream, unsigned char s); // returns EOF on error, otherwise (int) s
+	long int (*avail)(struct __stream *stream); // minimum # of bytes guaranteed to be available
 	int (*seek)(struct __stream *stream, long pos, int whence); // seeks to position
 	void *data; // data object
 	int ferr;
@@ -27,11 +28,13 @@ typedef struct __stream {
 extern stream_s *stream_create(
 	int (*get)(struct __stream *stream),
 	int (*put)(struct __stream *stream, unsigned char s),
+	long int (*avail)(struct __stream *stream),
 	int (*seek)(struct __stream *stream, long pos, int whence),
 	void *data);
 
 extern int stream_no_get(stream_s *stream);
 extern int stream_no_put(stream_s *stream, unsigned char s);
+extern long int stream_no_avail(stream_s *stream);
 extern int stream_no_seek(stream_s *stream, long pos, int whence);
 
 extern int stream_format(stream_s *stream, const char *format, ...);

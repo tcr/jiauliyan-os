@@ -7,20 +7,20 @@
 
 int lua_trim(lua_State *L)
 {
- const char *front;
- const char *end;
- size_t      size;
+	const char *front;
+	const char *end;
+	size_t      size;
 
- front = luaL_checklstring(L,1,&size);
- end   = &front[size - 1];
+	front = luaL_checklstring(L,1,&size);
+	end   = &front[size - 1];
 
- for ( ; size && isspace(*front) ; size-- , front++)
-   ;
- for ( ; size && isspace(*end) ; size-- , end--)
-   ;
+	for ( ; size && isspace(*front) ; size-- , front++)
+	;
+	for ( ; size && isspace(*end) ; size-- , end--)
+	;
 
- lua_pushlstring(L,front,(size_t)(end - front) + 1);
- return 1;
+	lua_pushlstring(L,front,(size_t)(end - front) + 1);
+	return 1;
 }
 
 int luaopen_trim(lua_State *L)

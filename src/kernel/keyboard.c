@@ -1,4 +1,5 @@
 #include <system.h>
+#include <common.h>
 #include <string.h>
 #include <vga.h>
 
@@ -122,13 +123,18 @@ void keyboard_interrupt(struct regs *r)
 
 int keyboardin_get(stream_s *stream)
 {
-	(void) stream;
-	
+	UNUSED(stream);	
 	// read from serial buffer
 	while (keyboard_buf_len == 0) { ; }
 	unsigned char c = keyboard_buf[0];
 	memcpy(keyboard_buf, keyboard_buf + 1, --keyboard_buf_len);
 	return c;
+}
+
+long int keyboardin_avail(stream_s *stream)
+{
+	UNUSED(stream);
+	return keyboard_buf_len;
 }
 
 stream_s *keyboardin;
@@ -143,5 +149,5 @@ void keyboard_install()
     irq_install_handler(1, keyboard_interrupt);
     
     // create keyboard stream
-    keyboardin = stream_create(keyboardin_get, stream_no_put, stream_no_seek, NULL);
+    keyboardin = stream_create(keyboardin_get, stream_no_put, keyboardin_avail, stream_no_seek, NULL);
 }

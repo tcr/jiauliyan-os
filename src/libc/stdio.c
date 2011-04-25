@@ -42,6 +42,12 @@ int file_entry_get(stream_s *stream)
 	return f->entry->data[f->pos++];
 }
 
+long int file_entry_avail(stream_s *stream)
+{
+	file_entry_data *f = (file_entry_data *) stream->data;
+	return f->entry->size - f->pos;
+}
+
 int file_entry_put(stream_s *stream, unsigned char c)
 {
 	file_entry_data *f = (file_entry_data *) stream->data;

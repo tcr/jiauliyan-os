@@ -148,6 +148,7 @@ void vga_setfg(unsigned char fg)
 /*
  * vga stream implementation
  */
+ 
 int vgaout_put(stream_s *stream, unsigned char c)
 {
 	(void) stream;
@@ -160,6 +161,7 @@ stream_s *vgaout;
 /*
  * initalize vga
  */
+ 
 void vga_init(void)
 {
 	// set text mem pointer, then clear screen
@@ -167,5 +169,5 @@ void vga_init(void)
 	vga_cls();
 	
 	// initialize vga stream
-	vgaout = stream_create(stream_no_get, vgaout_put, stream_no_seek, NULL);
+	vgaout = stream_create(stream_no_get, vgaout_put, stream_no_avail, stream_no_seek, NULL);
 }

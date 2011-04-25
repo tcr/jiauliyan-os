@@ -13,6 +13,7 @@ function cli()
 		io.write("> ")
 		io.flush()
 		cmd = trim(io.read())
+		cmd = trim( )
 		
 		if cmd == "ls" then
 			print("Directory listing whoo")

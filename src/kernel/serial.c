@@ -76,7 +76,6 @@ void serial_interrupt(struct regs *r)
 int serialin_get(stream_s *stream)
 {
 	UNUSED(stream);
-	
 	// read from serial buffer
 	if (serial_buf_len == 0)
 		return EOF;
@@ -85,10 +84,15 @@ int serialin_get(stream_s *stream)
 	return c;
 }
 
+long int serialin_avail(stream_s *stream)
+{
+	UNUSED(stream);
+	return serial_buf_len;
+}
+
 int serialout_put(stream_s *stream, unsigned char c)
 {
 	UNUSED(stream);
-	
 	serial_put((char) c);
 	return (int) c;
 }
@@ -114,6 +118,6 @@ void serial_install()
 	irq_install_handler(4, serial_interrupt);
 	
 	// create streams
-	serialout = stream_create(stream_no_get, serialout_put, stream_no_seek, NULL);
-	serialin = stream_create(serialin_get, stream_no_put, stream_no_seek, NULL);
+	serialout = stream_create(stream_no_get, serialout_put, stream_no_avail, stream_no_seek, NULL);
+	serialin = stream_create(serialin_get, stream_no_put, serialin_avail, stream_no_seek, NULL);
 }
