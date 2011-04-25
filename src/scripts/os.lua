@@ -8,12 +8,18 @@ function cli()
 	print("    sudo make me a sandwich\tThe club cant even handle me right now")
 	print("")
 	
+	serial_send("Serial output from lua\n");
+	
 	local cmd
 	while true do
 		io.write("> ")
 		io.flush()
 		cmd = trim(io.read())
-		cmd = trim( )
+		
+		a = serial_receive_all()
+		if string.len(a) > 0 then
+			print("Received serial input \[len " .. string.len(a) .. "\]: " .. a)
+		end
 		
 		if cmd == "ls" then
 			print("Directory listing whoo")
