@@ -83,6 +83,7 @@ void kernel_start()
 	l = lua_open();
 	// load lua libraries
 	luaL_openlibs(l);
+	luaopen_trim(l);
 	
 	// run the hello.lua script 
 	dofile = luaL_dofile(l, "os.lua");

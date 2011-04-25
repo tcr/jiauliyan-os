@@ -1,9 +1,5 @@
 print("Loading lua code...")
 
-function trim(s)
-	return (s:gsub("^%s*(.-)%s*$", "%1"))
-end
-
 function cli()
 	print("Welcome to the Lua command line.")
 	print("")
