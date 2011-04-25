@@ -709,6 +709,11 @@ size_t stream_puts(stream_s *stream, const char *text)
 /* put a decimal integer */
 void stream_puti(stream_s *stream, unsigned int a)
 {
+	unsigned int l = 0, b = a;
+	while (b / 10 > 0) {
+		l++;
+		b /= 10;
+	}
 	do {
 		/* print highest digit */
 		unsigned int b = a, d = 1;
@@ -721,7 +726,7 @@ void stream_puti(stream_s *stream, unsigned int a)
 		/* print rest */
 		while (a >= d)
 			a -= d;
-	} while (a > 0);
+	} while (l--);
 }
 
 /* put a hex char */

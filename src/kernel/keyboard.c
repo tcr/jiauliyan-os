@@ -74,6 +74,8 @@ void keyboard_flush()
 	}
 }
 
+#include <serial.h>
+
 void keyboard_interrupt(struct regs *r)
 {
 	(void) r;
@@ -105,6 +107,10 @@ void keyboard_interrupt(struct regs *r)
         *  held. If shift is held using the larger lookup table,
         *  you would add 128 to the scancode when you look for it */
 		keyboard_buf[keyboard_buf_len++] = kbdus[scancode];
+
+		// display to screen
+		vga_putchar(kbdus[scancode]);
+
 		if (keyboard_buf_len == KEYBOARD_BUF_SIZE)
 			keyboard_flush();
     }

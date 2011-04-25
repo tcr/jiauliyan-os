@@ -34,23 +34,20 @@ void kernel_keyboard_handler(unsigned char *buf, long int size)
 }
 
 void kernel_start()
-{
-	serial_set_handler(kernel_serial_handler); // serial buffer handler
-	keyboard_set_handler(kernel_keyboard_handler); // keyboard buffer handler
-	
-	vga_setbg(BLUE);
+{	
+	vga_setbg(DARK_GREY);
 	vga_cls();
 	
-	vga_setfg(LIGHT_BROWN);
+	vga_setfg(LIGHT_RED);
 	puts("Jiauliyan OS\n");
-	vga_setfg(WHITE);
+	vga_setfg(LIGHT_BROWN);
 	puts("An OS by some cool dudes\n\n");
 
 	puts("Address of kernel_start(): ");
 	stream_putp(vgaout, &kernel_start);
 	putchar('\n');
 
-	puts("Writing to serial port...\n");
+	puts("Testing write to serial port...\n");
 	stream_puts(serialout, "[SERIAL] Testing serial ports from Jiauliyan OS!\n");
 
 	/*
@@ -60,22 +57,22 @@ void kernel_start()
 	putchar('\n');
 	*/
 	
-	vga_setfg(LIGHT_BROWN);
-    puts("\nLua source:\n\n");
-    vga_setfg(WHITE);
-    
 	int size = (int)&_binary_os_lua_size;
 	UNUSED(size);
     char *data = (char *)&_binary_os_lua_start;
     
+	/*
+	vga_setfg(LIGHT_BROWN);
+    puts("\nLua source:\n\n");
+    vga_setfg(WHITE);    
     puts(data);
+    */
 	
 	FILE *f = fopen("os.lua", "w");
 	fputs(data, f);
 	fclose(f);
 	
-	vga_setfg(LIGHT_BROWN);
-    puts("\n\nRunning lua:\n\n");
+    puts("Starting lua.\n\n");
     vga_setfg(WHITE);
     
 /***************************/
@@ -92,8 +89,8 @@ void kernel_start()
 	
 	if (dofile == 0) {
 		// call foo
-		lua_getglobal(l,"foo");
-		lua_call(l,0,0);
+		lua_getglobal(l, "cli");
+		lua_call(l, 0, 0);
 	} else {
 		perror("Unable to run os.lua");
 	}
@@ -106,6 +103,8 @@ void kernel_start()
 	vga_setfg(LIGHT_GREEN);
 	puts("\nLua execution finished.\n\n");
 	
+	return;
+	
 	vga_setfg(WHITE);
 	puts("Testing input. Serial input is ");
 	vga_setfg(LIGHT_RED);
@@ -116,10 +115,13 @@ void kernel_start()
 	puts("green");
 	vga_setfg(WHITE);
 	puts(".\n");
+	
+	serial_set_handler(kernel_serial_handler); // serial buffer handler
+	//keyboard_set_handler(kernel_keyboard_handler); // keyboard buffer handler
 
 	/* Write your kernel here. */
 	for(;;) {
-		keyboard_flush();
+		//keyboard_flush();
 		serial_flush();
 	}
 }

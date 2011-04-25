@@ -6,9 +6,10 @@
 #include <string.h>
 #include <stdint.h>
 #include <errno.h>
-
 #include <stream.h>
+#include <keyboard.h>
 #include <vga.h>
+
 #include <serial.h>
 
 // http://www.acm.uiuc.edu/webmonkeys/book/c_guide/2.12.html#streams
@@ -67,8 +68,21 @@ int file_entry_seek(stream_s *stream, long pos, int origin)
 
 /* file object */
 
-//static FILE* create_file(
-
+static FILE* create_file(
+	stream_s *stream		// stream implementation
+	)
+{
+	FILE *f = malloc(sizeof(FILE));
+	f->stream = stream;
+	f->pos = 0;
+	f->flags = 0;
+	f->istemp = 0;
+	f->buffer = NULL;
+	f->bsize = 0;
+	f->eof = 0;
+	f->hold = EOF;
+	return f;	
+}
 
 /*
  * file functions
@@ -76,9 +90,8 @@ int file_entry_seek(stream_s *stream, long pos, int origin)
 
 void clearerr(FILE *file)
 {
-	UNUSED(file);
-	stream_puts(serialout, "clearerr() called");
-	//[TODO]
+	file->eof = 0;
+	file->stream->ferr = 0;
 }
 
 int fclose(FILE *file)
@@ -130,16 +143,7 @@ FILE *fopen(const char *filename, const char *mode)
 			stream->seek = file_entry_seek;
 			stream->data = data;
 			
-			FILE *file = (FILE *) malloc(sizeof(FILE));
-			file->stream = stream;
-			file->pos = 0;
-			file->flags = 0;
-			file->istemp = 0;
-			file->buffer = NULL;
-			file->bsize = 0;
-			file->eof = 0;
-			file->hold = 0;
-			return file;
+			return create_file(stream);
 		}
 	}
 	for (i = 0; i < 256; i++) {
@@ -160,23 +164,17 @@ FILE *fopen(const char *filename, const char *mode)
 }
 
 size_t fread(void *ptr, size_t size, size_t nmemb, FILE *file)
-{
+{	
 	unsigned char *p = (unsigned char *) ptr;
-	unsigned int i;
-	size_t j;
+	size_t i, j;
 	int a;
 	for (i = 0; i < nmemb; i++) {
 		for (j = 0; j < size; j++) {
-			a = file->stream->get(file->stream);
-			if (a == EOF) break;
+			if ((a = fgetc(file)) == EOF) break;
 			p[i*size + j] = (unsigned char) a;
 		}
 		if (a == EOF) break;
 	}
-	stream_puti(serialout, size);
-	stream_puts(serialout, " - ");
-	stream_puti(serialout, nmemb);
-	stream_puts(serialout, " fread() called\n");
 	return i;
 }
 
@@ -201,9 +199,18 @@ long int ftell(FILE *file)
 
 size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *file)
 {
-	UNUSED(ptr); UNUSED(size); UNUSED(nmemb); UNUSED(file);
-	stream_puts(serialout, "fwrite() called\n");
-	return -1;
+	//[TODO] does this defy the size component of fwrite?
+	unsigned char *p = (unsigned char *) ptr;
+	unsigned int i;
+	size_t j;
+	int a;
+	for (i = 0; i < nmemb; i++) {
+		for (j = 0; j < size; j++) {
+			if (a = fputc(p[i*size + j], file) == EOF) break;
+		}
+		if (a == EOF) break;
+	}
+	return i;
 }
 
 int remove(const char *filename)
@@ -359,13 +366,14 @@ int sscanf(const char *str, const char *format, ...)
  */
 
 int fgetc(FILE *file)
-{
+{		
 	if (file->stream == NULL)
 		return EOF;
 	if (file->hold != EOF) {
 		file->pos++;
 		int hold = file->hold;
 		file->hold = EOF;
+		
 		return hold;
 	}
 		
@@ -382,9 +390,10 @@ char *fgets(char *str, int n, FILE *file)
 		return NULL;
 		
 	file->pos++;
-	int c = '\0', i = 0;
-	while (i < n && c != '\n' && (c = fgetc(file)) != EOF)
+	int c = EOF, i = 0;
+	while (i < n && c != '\n' && (c = fgetc(file)) != EOF) {
 		str[i++] = c;
+	}
 	str[i] = '\0';
 	return str;
 }
@@ -434,12 +443,13 @@ void perror(const char *s)
  * standard streams
  */
 
-FILE fstdout = { NULL, 0L, 0, 0, NULL, 0, 0, '\0' };
-FILE *stdout = &fstdout;
+FILE *stdout;
 FILE *stdin;
-FILE *stderr = &fstdout; // [TODO] change this
+FILE *stderr;
 
 void stdio_init()
 {
-	fstdout.stream = vgaout;
+	stdout = create_file(vgaout);
+	stdin = create_file(keyboardin);
+	stderr = stdout; // [TODO] change this
 }
