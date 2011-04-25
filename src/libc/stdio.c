@@ -206,7 +206,7 @@ size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *file)
 	int a;
 	for (i = 0; i < nmemb; i++) {
 		for (j = 0; j < size; j++) {
-			if (a = fputc(p[i*size + j], file) == EOF) break;
+			if ((a = fputc(p[i*size + j], file)) == EOF) break;
 		}
 		if (a == EOF) break;
 	}

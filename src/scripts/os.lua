@@ -1,5 +1,9 @@
 print("Loading lua code...")
 
+function trim(s)
+	return (s:gsub("^%s*(.-)%s*$", "%1"))
+end
+
 function cli()
 	print("Welcome to the Lua command line.")
 	print("")
@@ -12,7 +16,7 @@ function cli()
 	while true do
 		io.write("> ")
 		io.flush()
-		cmd = io.read()
+		cmd = trim(io.read())
 		
 		if cmd == "ls" then
 			print("Directory listing whoo")
