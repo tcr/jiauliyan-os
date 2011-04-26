@@ -1,7 +1,6 @@
 require "json"
 
 print("Loading lua code...")
-print (json.encode( { 1, 2, 'fred', {first='mars',second='venus',third='earth'} } ))
 
 function on_receive(msg)
 	print("Received message:\n" .. msg)
