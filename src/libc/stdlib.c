@@ -44,7 +44,8 @@ static Header *morecore(unsigned nu);
 static Header base;		/* empty list to get started */
 static Header *freep = NULL;	/* start of free list */
 
-void* malloc(unsigned nbytes) {
+void* malloc(unsigned nbytes)
+{
     Header *p, *prevp;		
     Header *morecore(unsigned);
     unsigned nunits;
@@ -77,18 +78,20 @@ void* malloc(unsigned nbytes) {
 
 static int first = 1;
 
-char *sbrk(int nbytes) {
+char *sbrk(int nbytes)
+{
 	UNUSED(nbytes);
 	if (first == 0) {
 		puts("\nREQUESTING MEMORY WHERE THERE IS NONE\n");
 		return NULL;
 	}
 	first--;
-	return (char *) 0x10000000;
+	return (char *) 0x02000000;
 }
 
 /* morecore: ask system for memory */
-static Header *morecore(unsigned nu) {
+static Header *morecore(unsigned nu)
+{
     char *cp, *sbrk(int);
     void free(void*);
     Header *up;
@@ -169,7 +172,3 @@ void srand(unsigned int seed)
 {
 	(void) seed;
 }
-
-	        
-	    
-			 

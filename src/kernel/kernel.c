@@ -16,6 +16,8 @@
 
 extern int _binary_os_lua_start;
 extern int _binary_os_lua_size;
+extern int _binary_json_lua_start;
+extern int _binary_json_lua_size;
 
 void kernel_serial_handler(unsigned char *buf, long int size)
 {
@@ -31,6 +33,23 @@ void kernel_keyboard_handler(unsigned char *buf, long int size)
 	int i;
 	for (i = 0; i < size; i++)
 		vga_putchar((char) buf[i]);
+}
+
+void load_file_data(char *name, char *data, int data_size)
+{
+	FILE *f = fopen(name, "w");
+	fwrite(data, 1, data_size, f);
+	fclose(f);
+}
+
+void dump_file(char *name)
+{
+	FILE *f = fopen(name, "r");
+	char *buf = malloc(1024*48);
+	size_t l = fread(buf, 1, 1024*48, f);
+	buf[l] = '\0';
+	puts(buf);
+	fclose(f);
 }
 
 void kernel_start()
@@ -57,24 +76,14 @@ void kernel_start()
 	putchar('\n');
 	*/
 	
-	int data_size = (int)&_binary_os_lua_size;
-    char *data = (char *)&_binary_os_lua_start;
-    
-	/*
-	vga_setfg(LIGHT_BROWN);
-    puts("\nLua source:\n\n");
-    vga_setfg(WHITE);    
-    puts(data);
-    */
+	load_file_data("os.lua", (char *) &_binary_os_lua_start, (int) &_binary_os_lua_size);
+	load_file_data("json.lua", (char *) &_binary_json_lua_start, (int) &_binary_json_lua_size);
 	
-	FILE *f = fopen("os.lua", "w");
-	fwrite(data, 1, data_size, f);
-	fclose(f);
 	
     puts("Starting lua.\n\n");
     vga_setfg(WHITE);
     
-/***************************/
+/**************************/
 	
 	lua_State* l;
 	int dofile;
@@ -84,16 +93,21 @@ void kernel_start()
 	luaL_openlibs(l);
 	luaopen_trim(l);
 	
-	// run the hello.lua script 
-	dofile = luaL_dofile(l, "os.lua");
-	
-	if (dofile == 0) {
-		// call foo
-		lua_getglobal(l, "cli");
-		lua_call(l, 0, 0);
-	} else {
-		fprintf(stderr, "Unable to run os.lua: %s\n", lua_tostring(l, -1));
+	dofile = luaL_dofile(l, "json.lua");
+	if (dofile != 0) {
+		fprintf(stderr, "Unable to run json.lua: %s\n", lua_tostring(l, -1));
+		exit(EXIT_FAILURE);
 	}
+	
+	dofile = luaL_dofile(l, "os.lua");
+	if (dofile != 0) {
+		fprintf(stderr, "Unable to run os.lua: %s\n", lua_tostring(l, -1));
+		exit(EXIT_FAILURE);
+	}
+	
+	// start command line
+	lua_getglobal(l, "cli");
+	lua_call(l, 0, 0);
 	
 	// cleanup Lua
 	lua_close(l);

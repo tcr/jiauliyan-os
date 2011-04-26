@@ -1,4 +1,7 @@
+require "json"
+
 print("Loading lua code...")
+print (json.encode( { 1, 2, 'fred', {first='mars',second='venus',third='earth'} } ))
 
 function on_receive(msg)
 	print("Received message:\n" .. msg)
@@ -53,7 +56,7 @@ function cli()
 		elseif cmd == "sudo make me a sandwich" then
 			print("Make it yoself")
 		elseif prog == "fetch" then
-			send_message(cmdp[2] or '')
+			send_message(json.encode({action='httpreq', method='get', url=cmdp[2] or ''}))
 			repeat until check_serial_input()
 		else
 			print("Unrecognized command: " .. cmd)

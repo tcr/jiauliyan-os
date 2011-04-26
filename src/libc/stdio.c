@@ -181,6 +181,14 @@ size_t fread(void *ptr, size_t size, size_t nmemb, FILE *file)
 		}
 		if (a == EOF) break;
 	}
+	
+	void *bbb;
+	bbb = malloc(1);
+	free(bbb);
+	bbb = malloc(1);
+	free(bbb);
+	bbb = malloc(1);
+	free(bbb);
 	return i;
 }
 
