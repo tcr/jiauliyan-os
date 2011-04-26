@@ -2,13 +2,16 @@ require "json"
 
 print("Loading lua code...")
 
-function on_receive(msg)
-	print("Received message:\n" .. msg)
-end
+-- sends a serial message with two bytes for length and then input
 
 function send_message(msg)
 	serial_send(string.char(math.floor(msg:len() / 256), msg:len() % 256) .. msg)
 end
+
+-- serial message polling
+-- format: two bytes describing message size (<65536b) then listens for
+-- message; returns true if message is received and on_receive() is called
+-- else, false
 
 local serin = ""
 
@@ -24,6 +27,20 @@ function check_serial_input()
 	end
 	return false
 end
+
+--[[--------------------------------------------------------------------
+Jiauliyan OS Lua Command Line
+----------------------------------------------------------------------]]
+
+-- on serial message received
+-- msg has been decoded from JSON
+
+function on_receive(msg)
+	print("Received message:\n" .. msg)
+end
+
+-- Command line interface loop
+-- Executes command as the user enters them
 
 function cli()
 	print("Welcome to the Lua command line.")
