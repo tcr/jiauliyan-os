@@ -37,6 +37,7 @@ int luaZ_lookahead (ZIO *z) {
     if (luaZ_fill(z) == EOZ)
       return EOZ;
     else {
+		
       z->n++;  /* luaZ_fill removed first byte; put back it */
       z->p--;
     }

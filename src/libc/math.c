@@ -1,4 +1,5 @@
 #include <math.h>
+#include <stdint.h>
 
 // Reference:
 // https://github.com/nickbjohnson4224/rhombus/tree/master/libc/math
@@ -122,7 +123,18 @@ double log10(double x)
 
 double modf(double x, double *iptr)
 {
-	return __builtin_modf(x, iptr);
+	if (fabs(x) >= 4503599627370496.0) {
+		*iptr = x;
+		return 0.0;
+	}
+	else if (fabs(x) < 1.0) {
+		*iptr = 0.0;
+		return x;
+	}
+	else {
+		*iptr = (double) (int64_t) x;
+		return (x - *iptr);
+	}
 }
 
 double pow(double b, double e)
@@ -169,7 +181,9 @@ double fabs(double x)
 
 double floor(double x)
 {
-	return __builtin_floor(x);
+	modf(x, &x);
+	if (x < 0.0) x -= 1.0;
+	return x;
 }
 
 double fmod(double x, double div)

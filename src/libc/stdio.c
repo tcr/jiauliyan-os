@@ -160,7 +160,7 @@ FILE *fopen(const char *filename, const char *mode)
 			strncpy((char *) &(root[i]->name), filename, 256);
 			root[i]->data = NULL;
 			root[i]->size = 0;
-			root[i]->max = 1024;
+			root[i]->max = 0;
 			
 			return fopen(filename, mode);
 		}
@@ -437,12 +437,12 @@ int ungetc(int c, FILE *file)
  
 void perror(const char *s)
 {
-	if (errno) {
+	//if (errno) {
 		if (s)
 			fprintf(stderr, "%s: %s\n", s, strerror(errno));
 		else
 			fprintf(stderr, "%s\n", strerror(errno));
-	}
+	//}
 }
 
 /*

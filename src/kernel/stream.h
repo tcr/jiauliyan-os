@@ -14,7 +14,7 @@
 #define _IOLBF          0x001
 #define _IONBF          0x002
 
-#define BUFSIZ 1024
+#define BUFSIZ 1024*8
 
 typedef struct __stream {
 	int (*get)(struct __stream *stream); // reads a character

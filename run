@@ -1,1 +1,1 @@
-qemu -kernel bin/kernel.bin -no-kvm -serial stdio -m 512
+qemu -kernel bin/kernel.bin -no-kvm -serial pty -m 512

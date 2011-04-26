@@ -57,8 +57,7 @@ void kernel_start()
 	putchar('\n');
 	*/
 	
-	int size = (int)&_binary_os_lua_size;
-	UNUSED(size);
+	int data_size = (int)&_binary_os_lua_size;
     char *data = (char *)&_binary_os_lua_start;
     
 	/*
@@ -69,7 +68,7 @@ void kernel_start()
     */
 	
 	FILE *f = fopen("os.lua", "w");
-	fputs(data, f);
+	fwrite(data, 1, data_size, f);
 	fclose(f);
 	
     puts("Starting lua.\n\n");
@@ -93,7 +92,7 @@ void kernel_start()
 		lua_getglobal(l, "cli");
 		lua_call(l, 0, 0);
 	} else {
-		perror("Unable to run os.lua");
+		fprintf(stderr, "Unable to run os.lua: %s\n", lua_tostring(l, -1));
 	}
 	
 	// cleanup Lua
