@@ -10,8 +10,8 @@
  * comments in to give you an idea of what key is what, even
  * though I set it's array index to 0. You can change that to
  * whatever you want using a macro, if you wish! */
- 
-char kbdus[128] =
+int shift_pressed = 0, capslock = 0;
+char kbdus[256] =
 {
 	0,  27, '1', '2', '3', '4', '5', '6', '7', '8',	/* 9 */
 	'9', '0', '-', '=', '\b',	/* Backspace */
@@ -49,6 +49,44 @@ char kbdus[128] =
 	0,	/* F11 Key */
 	0,	/* F12 Key */
 	0,	/* All other keys are undefined */
+	/* 90 through 128 undefined */
+/* SHIFT VALUES add 90 to get to shift value */
+	0,  27, '!', '@', '#', '$', '%', '^', '&', '*',	/* 9 */
+	'(', ')', '_', '+', '\b',	/* BACKSPACE */
+	'\t',			/* TAB */
+	'Q', 'W', 'E', 'R',	/* 19 */
+	'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', '\n',	/* ENTER KEY */
+	0,			/* 29   - CONTROL */
+	'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ':',	/* 39 */
+	'"', '~',   0,		/* LEFT SHIFT */
+	'|', 'Z', 'X', 'C', 'V', 'B', 'N',			/* 49 */
+	'M', '<', '>', '?',   0,			/* RIGHT SHIFT */
+	'*',
+	0,	/* ALT */
+	' ',	/* SPACE BAR */
+	0,	/* CAPS LOCK */
+	0,	/* 59 - F1 KEY ... > */
+	0,   0,   0,   0,   0,   0,   0,   0,
+	0,	/* < ... F10 */
+	0,	/* 69 - NUM LOCK*/
+	0,	/* SCROLL LOCK */
+	0,	/* HOME KEY */
+	0,	/* UP ARROW */
+	0,	/* PAGE UP */
+	'-',
+	0,	/* LEFT ARROW */
+	0,
+	0,	/* RIGHT ARROW */
+	'+',
+	0,	/* 79 - END KEY*/
+	0,	/* DOWN ARROW */
+	0,	/* PAGE DOWN */
+	0,	/* INSERT KEY */
+	0,	/* DELETE KEY */
+	0,   0,   0,
+	0,	/* F11 KEY */
+	0,	/* F12 KEY */
+	0,	/* ALL OTHER KEYS ARE UNDEFINED */
 };
 
 /*
@@ -92,6 +130,11 @@ void keyboard_interrupt(struct regs *r)
     {
         /* You can use this one to see if the user released the
         *  shift, alt, or control keys... */
+	   
+	    /* left shift */
+	    if (((scancode & 0x7F) == 42) || ((scancode & 0x7F) == 54)) {
+		    shift_pressed--;
+	    } 
     }
     else
     {
@@ -107,13 +150,20 @@ void keyboard_interrupt(struct regs *r)
         *  to the above layout to correspond to 'shift' being
         *  held. If shift is held using the larger lookup table,
         *  you would add 128 to the scancode when you look for it */
-		keyboard_buf[keyboard_buf_len++] = kbdus[scancode];
+        /* left or right shift pressed! */
+	    if ((scancode == 42) || (scancode == 54)){
+		    shift_pressed++;
+	    } else if (scancode == 58) {
+		    capslock = !capslock;
+		    shift_pressed += -1 + 2 * (capslock);
+	    } else {
+		    keyboard_buf[keyboard_buf_len++] = kbdus[scancode + (shift_pressed > 0) * 90];
+		    /* display to screen */
+		    vga_putchar(kbdus[scancode + (shift_pressed > 0) * 90]);
 
-		// display to screen
-		vga_putchar(kbdus[scancode]);
-
-		if (keyboard_buf_len == KEYBOARD_BUF_SIZE)
-			keyboard_flush();
+		    if (keyboard_buf_len == KEYBOARD_BUF_SIZE)
+			    keyboard_flush();
+	    }
     }
 }
 
