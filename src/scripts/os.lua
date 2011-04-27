@@ -48,6 +48,7 @@ function cli()
 	print("Current commands:")
 	print("    ls\t\t\t\tList available commands")
 	print("    fetch [url]\t\t\tFetch a url over serial")
+	print("    image [url]\t\t\tFetch an image over serial")
 	print("    sudo make me a sandwich\tThe club cant even handle me right now")
 	print("")
 	
@@ -73,6 +74,9 @@ function cli()
 			print("Make it yoself")
 		elseif prog == "fetch" then
 			send_message(json.encode({action='httpreq', method='get', url=cmdp[2] or ''}))
+			repeat until check_serial_input()
+		elseif prog == "image" then
+			send_message(json.encode({action='httpimage', method='get', url=cmdp[2] or ''}))
 			repeat until check_serial_input()
 		else
 			print("Unrecognized command: " .. cmd)

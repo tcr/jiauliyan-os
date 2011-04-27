@@ -99,6 +99,7 @@ void kernel_start()
 		exit(EXIT_FAILURE);
 	}
 	
+    dump_file("os.lua");
 	dofile = luaL_dofile(l, "os.lua");
 	if (dofile != 0) {
 		fprintf(stderr, "Unable to run os.lua: %s\n", lua_tostring(l, -1));
@@ -160,7 +161,6 @@ void kmain( void* mbd, unsigned int magic )
     idt_install();
     isrs_install();
     irq_install();
-    
     // services
     vga_init();
     timer_install();
