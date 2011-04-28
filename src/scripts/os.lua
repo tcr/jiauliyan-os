@@ -1,11 +1,11 @@
---json = require("dkjson")
+json = require("dkjson").json
 
 print("Loading lua code...")
 
 -- sends a serial message with two bytes for length and then input
 
 function send_message(msg)
-	serial_send(string.char(math.floor(msg:len() / 256), msg:len() % 256) .. msg)
+	serial.send(string.char(math.floor(msg:len() / 256), msg:len() % 256) .. msg)
 end
 
 -- serial message polling
@@ -16,11 +16,13 @@ end
 local serin = ""
 
 function check_serial_input()
-	serin = serin .. serial_receive_all()
+	serin = serin .. serial.receive_all()
 	if serin:len() > 2 then
 		local l = serin:byte(1)*256 + serin:byte(2)
 		if serin:len() >= l + 2 then
-			on_receive(json.decode(serin:sub(3, l + 3)))
+			if not pcall(function () on_receive(json.decode(serin:sub(3, l + 3))) end) then
+				print("[ERROR] Bad input.")
+			end
 			serin = serin:sub(l + 3)
 			return true
 		end
@@ -36,23 +38,31 @@ Jiauliyan OS Lua Command Line
 -- msg has been decoded from JSON
 
 function on_receive(msg)
-	msg = json.decode("{'a': [ ]}")
-	for i,v in ipairs(msg) do
-		print("Tweet:")
+	if msg['action'] == 'httpreq' then
+		print(msg['result'])
+--		for i,v in ipairs(msg) do
+--			print("Tweet:")
+--		end
+	elseif msg['action'] == 'httpimage' then
+		print(msg['result'])
+	else
+		print("Cannot handle action \"" .. msg['action'] .. '"')
 	end
-	--print("Received message:\n" .. msg)
 end
 
 -- Command line interface loop
 -- Executes command as the user enters them
 
 function cli()
+	vga.setfg(vga.LIGHT_CYAN)
 	print("Welcome to the Lua command line.")
 	print("")
 	print("Current commands:")
 	print("    ls\t\t\t\tList available commands")
 	print("    fetch [url]\t\t\tFetch a url over serial")
+	print("    image [url]\t\t\tFetch an image over serial")
 	print("    sudo make me a sandwich\tThe club cant even handle me right now")
+	vga.setfg(vga.WHITE)
 	print("")
 	
 	io.write("Launch HTTP server, then press RETURN...")
@@ -81,6 +91,9 @@ function cli()
 		elseif prog == "get-tweets" then
 			print("Fetching tweets...")
 			send_message(json.encode({action='httpreq', method='get', url='http://identi.ca/api/statuses/friends_timeline/tiles.json'}))
+			repeat until check_serial_input()
+		elseif prog == "image" then
+			send_message(json.encode({action='httpimage', method='get', url=cmdp[2] or ''}))
 			repeat until check_serial_input()
 		else
 			print("Unrecognized command: " .. cmd)

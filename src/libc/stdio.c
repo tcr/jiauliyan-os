@@ -152,20 +152,23 @@ FILE *fopen(const char *filename, const char *mode)
 			return create_file(stream);
 		}
 	}
-	for (i = 0; i < 256; i++) {
-		if (root[i] == NULL) {
-			//puts("Creating file...\n");
-			
-			root[i] = (file_entry *) malloc(sizeof(file_entry));
-			strncpy((char *) &(root[i]->name), filename, 256);
-			root[i]->data = NULL;
-			root[i]->size = 0;
-			root[i]->max = 0;
-			
-			return fopen(filename, mode);
+	
+	if (strcmp(mode, "r") != 0) {
+		for (i = 0; i < 256; i++) {
+			if (root[i] == NULL) {
+				//puts("Creating file...\n");
+				
+				root[i] = (file_entry *) malloc(sizeof(file_entry));
+				strncpy((char *) &(root[i]->name), filename, 256);
+				root[i]->data = NULL;
+				root[i]->size = 0;
+				root[i]->max = 0;
+				
+				return fopen(filename, mode);
+			}
 		}
+		puts("ERROR: Exceeded max of 256 files!");
 	}
-	puts("ERROR: Exceeded max of 256 files!");
 	return NULL;
 }
 

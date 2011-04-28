@@ -13,6 +13,7 @@
 #include "../../lua-5.1/src/lua.h"
 #include "../../lua-5.1/src/lualib.h"
 #include "../../lua-5.1/src/lauxlib.h"
+#include <lua_kernel.h>
 
 extern int _binary_os_lua_start;
 extern int _binary_os_lua_size;
@@ -80,7 +81,7 @@ void kernel_start()
 	l = lua_open();
 	// load lua libraries
 	luaL_openlibs(l);
-	luaopen_trim(l);
+	luaopen_kernel(l);
 	
 	dofile = luaL_dofile(l, "dkjson.lua");
 	if (dofile != 0) {
@@ -149,7 +150,6 @@ void kmain( void* mbd, unsigned int magic )
     idt_install();
     isrs_install();
     irq_install();
-    
     // services
     vga_init();
     timer_install();

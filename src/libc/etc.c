@@ -25,11 +25,14 @@ sighandler_t signal(int signum, sighandler_t handler)
 }
 
 char *no_data = "";
+char *LUA_PATH = ".a?.lua;?.lua";
 
 char *getenv(const char *name)
 {
-	stream_puts(serialout, name);
-	stream_puts(serialout, " getenv() called.\n");
+	//printf("[DEBUG] getenv(%s) called\n", name);
+	if (strcmp(name, "LUA_PATH") == 0) {
+		return LUA_PATH;
+	}
 	return no_data;
 }
 

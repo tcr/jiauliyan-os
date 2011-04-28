@@ -95,6 +95,8 @@
 -- CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE. 
 
+module("dkjson", package.seeall)
+
 -- global dependencies:
 local pairs, type, tostring, tonumber, getmetatable, setmetatable =
       pairs, type, tostring, tonumber, getmetatable, setmetatable
@@ -108,7 +110,7 @@ if _VERSION == "Lua 5.2" then
   _ENV = nil
 end
 
-local json = {}
+json = {}
 
 json.null = setmetatable ({}, {__tojson = function () return "null" end})
 
