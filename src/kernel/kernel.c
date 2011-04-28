@@ -16,8 +16,8 @@
 
 extern int _binary_os_lua_start;
 extern int _binary_os_lua_size;
-extern int _binary_json_lua_start;
-extern int _binary_json_lua_size;
+extern int _binary_dkjson_lua_start;
+extern int _binary_dkjson_lua_size;
 
 void kernel_serial_handler(unsigned char *buf, long int size)
 {
@@ -39,16 +39,6 @@ void load_file_data(char *name, char *data, int data_size)
 {
 	FILE *f = fopen(name, "w");
 	fwrite(data, 1, data_size, f);
-	fclose(f);
-}
-
-void dump_file(char *name)
-{
-	FILE *f = fopen(name, "r");
-	char *buf = malloc(1024*48);
-	size_t l = fread(buf, 1, 1024*48, f);
-	buf[l] = '\0';
-	puts(buf);
 	fclose(f);
 }
 
@@ -77,8 +67,7 @@ void kernel_start()
 	*/
 	
 	load_file_data("os.lua", (char *) &_binary_os_lua_start, (int) &_binary_os_lua_size);
-	load_file_data("json.lua", (char *) &_binary_json_lua_start, (int) &_binary_json_lua_size);
-	
+	load_file_data("dkjson.lua", (char *) &_binary_dkjson_lua_start, (int) &_binary_dkjson_lua_size);
 	
     puts("Starting lua.\n\n");
     vga_setfg(WHITE);
@@ -93,9 +82,9 @@ void kernel_start()
 	luaL_openlibs(l);
 	luaopen_trim(l);
 	
-	dofile = luaL_dofile(l, "json.lua");
+	dofile = luaL_dofile(l, "dkjson.lua");
 	if (dofile != 0) {
-		fprintf(stderr, "Unable to run json.lua: %s\n", lua_tostring(l, -1));
+		fprintf(stderr, "Unable to run dkjson.lua: %s\n", lua_tostring(l, -1));
 		exit(EXIT_FAILURE);
 	}
 	

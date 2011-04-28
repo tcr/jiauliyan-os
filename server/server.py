@@ -14,8 +14,8 @@ def on_receive(act):
 	# parameters attached to it
 	if act['action'] == 'httpreq':
 		print "HTTP Request " + act['url'] + ":"
-		resp, content = http.request("http://" + act['url'])
-		send_msg(content)
+		resp, content = http.request(act['url'])
+		send_msg(json.dumps(content))
 		print "Data sent."
 	else:
 		print "Unrecognized action \"" + act['action'] + "\""

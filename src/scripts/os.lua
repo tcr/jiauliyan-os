@@ -1,4 +1,4 @@
-require "json"
+--json = require("dkjson")
 
 print("Loading lua code...")
 
@@ -20,7 +20,7 @@ function check_serial_input()
 	if serin:len() > 2 then
 		local l = serin:byte(1)*256 + serin:byte(2)
 		if serin:len() >= l + 2 then
-			on_receive(serin:sub(3, l + 3))
+			on_receive(json.decode(serin:sub(3, l + 3)))
 			serin = serin:sub(l + 3)
 			return true
 		end
@@ -36,7 +36,11 @@ Jiauliyan OS Lua Command Line
 -- msg has been decoded from JSON
 
 function on_receive(msg)
-	print("Received message:\n" .. msg)
+	msg = json.decode("{'a': [ ]}")
+	for i,v in ipairs(msg) do
+		print("Tweet:")
+	end
+	--print("Received message:\n" .. msg)
 end
 
 -- Command line interface loop
@@ -72,7 +76,11 @@ function cli()
 		elseif cmd == "sudo make me a sandwich" then
 			print("Make it yoself")
 		elseif prog == "fetch" then
-			send_message(json.encode({action='httpreq', method='get', url=cmdp[2] or ''}))
+			send_message(json.encode({action='httpreq', method='get', url='http://' .. (cmdp[2] or '')}))
+			repeat until check_serial_input()
+		elseif prog == "get-tweets" then
+			print("Fetching tweets...")
+			send_message(json.encode({action='httpreq', method='get', url='http://identi.ca/api/statuses/friends_timeline/tiles.json'}))
 			repeat until check_serial_input()
 		else
 			print("Unrecognized command: " .. cmd)

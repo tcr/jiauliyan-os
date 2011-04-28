@@ -24,131 +24,112 @@ int atoi(const char *nptr) {
 }
 
 /*
- * K&R malloc
+ * K&R-style malloc
  */
 
-typedef long Align;		/* for alignment to long boundary */
+typedef struct header {
+	struct header *next;  	/* next block if on free list */
+	unsigned int size;		/* size of this block in bytes */
+} Header __attribute__ ((aligned));
 
-union header {			/* block header */
-    struct {
-		union header	*ptr;  	/* next block if on free list */
-		unsigned 	size;	/* size of this block */
-    } s;
-    Align x;			/* force alignment of blocks */
-};
+#define BLOCKSIZ		sizeof(Header)
+#define BLOCK_ALIGN(B)	((B+BLOCKSIZ-1)/BLOCKSIZ) + 1
+#define BLOCK_PTR(B)	((void *) B+1)
+#define PTR_BLOCK(B)	(((Header *) B)-1)
 
-typedef union header Header;
+#define MEMLOC			((char *) 0x02000000)		/* memory start */
+#define ALLOCSIZ		1024*1024*256/BLOCKSIZ		/* memory size in blocks */
 
-static Header *morecore(unsigned nu);
-
-static Header base;		/* empty list to get started */
-static Header *freep = NULL;	/* start of free list */
+static Header base; /* root block */
+static Header *freep = NULL; /* start of free block list */
 
 void* malloc(unsigned nbytes)
 {
-    Header *p, *prevp;		
-    Header *morecore(unsigned);
-    unsigned nunits;
+	if (nbytes == 0)
+		return NULL;
+	
+	/* round number of units up to block size */
+    unsigned nunits = BLOCK_ALIGN(nbytes);
 
-    nunits = (nbytes+sizeof(Header)-1)/sizeof(Header) + 1;
-
-    if ((prevp = freep) == NULL) {	/* no free list yet */
-		base.s.ptr = freep = prevp = &base;		base.s.size = 0;
+    Header *prevp;
+    if ((prevp = freep) == NULL) {
+		/* initialize free segment */
+		Header *e = (Header *) MEMLOC;
+		e->next = freep = prevp = &base; e->size = ALLOCSIZ;
+		base.next = e; base.size = 0;
     }
-    for (p = prevp->s.ptr; ; prevp = p, p = p->s.ptr) {
-		if (p->s.size >= nunits) {	/* big enough */
-			if (p->s.size == nunits) { 	/* exactly */
-				prevp->s.ptr = p->s.ptr;
-			} else {			/* allocate tail end */
-				p->s.size -= nunits;
-				p += p->s.size;		
-				p->s.size = nunits;
+    
+    Header *p;
+    for (p = prevp->next; ; prevp = p, p = p->next) {
+		/* check block size */
+		if (p->size >= nunits) {
+			if (p->size == nunits) {
+				/* exact */
+				prevp->next = p->next;
+			} else {
+				/* allocate tail end */
+				p->size -= nunits;
+				p += p->size;		
+				p->size = nunits;
 			}
+			
+			/* move free pointer */
 			freep = prevp;
-			return (void*) (p+1);
+			return BLOCK_PTR(p);
 		}
-		if ( p == freep) {		/* wrapped around free list */
-			if ((p = morecore(nunits)) == NULL)
-				return NULL; /* none left */
+		
+		if (p == freep) {
+			/* wrapped around free list; no blocks left */
+			return NULL;
 		}
     }
-}
-
-#define NALLOC 	1024*1024*256/sizeof(Header)	/* minimum #units to request	*/
-
-static int first = 1;
-
-char *sbrk(int nbytes)
-{
-	UNUSED(nbytes);
-	if (first == 0) {
-		puts("\nREQUESTING MEMORY WHERE THERE IS NONE\n");
-		return NULL;
-	}
-	first--;
-	return (char *) 0x02000000;
-}
-
-/* morecore: ask system for memory */
-static Header *morecore(unsigned nu)
-{
-    char *cp, *sbrk(int);
-    void free(void*);
-    Header *up;
-    if (nu < NALLOC)
-		nu = NALLOC;
-    cp = sbrk(nu * sizeof(Header));
-    if (cp == (char *) -1)		/* no space at all */
-		return NULL;
-    up = (Header*) cp;
-    up->s.size = nu;
-    free((void*)(up+1));
-    return freep;
 }
 
 /* free: put block ap in free list */
+
 void free(void *ap)
 {
-    Header *bp, *p;
-    
+    /* check */
 	if (ap == NULL)
 		return;
+		
+    Header *bp = PTR_BLOCK(ap), *p;
     
-    bp = (Header*) ap - 1;		/* point to block header */
-    for (p = freep; !(bp > p && bp < p->s.ptr); p = p->s.ptr)
-		if (p >= p->s.ptr && (bp > p || bp < p->s.ptr))
-			break;	/* freed block at start or end of arena */
+    /* free blocks at start or end of arena */
+    for (p = freep; !(bp > p && bp < p->next); p = p->next)
+		if (p >= p->next && (bp > p || bp < p->next))
+			break;
 			
-    if (bp + bp->s.size == p->s.ptr) {	/* join to upper nbr */
-		bp->s.size += p->s.ptr->s.size;
-		bp->s.ptr = p->s.ptr->s.ptr;
+    if (bp + bp->size == p->next) {
+		/* join to upper nbr */
+		bp->size += p->next->size;
+		bp->next = p->next->next;
     } else
-		bp->s.ptr = p->s.ptr;
-    if ( p + p->s.size == bp ) {		/* join to lower nbr */
-		p->s.size += bp->s.size;
-		p->s.ptr = bp->s.ptr;
+		bp->next = p->next;
+		
+    if (p + p->size == bp) {
+		/* join to lower nbr */
+		p->size += bp->size;
+		p->next = bp->next;
     } else
-		p->s.ptr = bp;
+		p->next = bp;
+	
+	/* move free list head */
     freep = p;
 }
 
-/*
- * realloc
- */
+/* realloc */
 
 void *realloc(void *ptr, size_t size)
 {
-	void *newptr = NULL;
-	if (size > 0)
-		newptr = malloc(size);
+	void *newptr = malloc(size);
+	
 	if (ptr != NULL) {
-		if (size > 0) {
-			Header *bp = (Header*) ptr - 1;		/* point to block header */
-			unsigned int bsize = (bp->s.size - 1) * sizeof(Header);
-			unsigned int dsize = size > bsize ? bsize : size;
-			memcpy(newptr, ptr, dsize);
-			memset(newptr + dsize, 0, size - dsize);
-		}
+		Header *bp = PTR_BLOCK(ptr);		/* point to block header */
+		unsigned int bsize = (bp->size - 1) * BLOCKSIZ;
+		unsigned int dsize = size > bsize ? bsize : size;
+		memcpy(newptr, ptr, dsize);
+		memset(newptr + dsize, 0, size - dsize);
 		free(ptr);
 	}
 	return newptr;

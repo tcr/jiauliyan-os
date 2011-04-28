@@ -173,35 +173,27 @@ size_t fread(void *ptr, size_t size, size_t nmemb, FILE *file)
 {	
 	unsigned char *p = (unsigned char *) ptr;
 	size_t i, j;
-	int a;
+	int b;
 	for (i = 0; i < nmemb; i++) {
 		for (j = 0; j < size; j++) {
-			if ((a = fgetc(file)) == EOF) break;
-			p[i*size + j] = (unsigned char) a;
+			if ((b = fgetc(file)) == EOF) break;
+			p[i*size + j] = (unsigned char) b;
 		}
-		if (a == EOF) break;
+		if (b == EOF) break;
 	}
-	
-	void *bbb;
-	bbb = malloc(1);
-	free(bbb);
-	bbb = malloc(1);
-	free(bbb);
-	bbb = malloc(1);
-	free(bbb);
 	return i;
 }
 
 FILE *freopen(const char *filename, const char *mode, FILE *stream)
 {
 	UNUSED(filename); UNUSED(mode); UNUSED(stream);
-	stream_puts(serialout, "freopen() called\n");
+	puts("freopen() called\n");
 	return NULL;
 }
 
 int fseek(FILE *file, long int offset, int whence)
 {
-	stream_puts(serialout, "fseek() called\n");
+	puts("fseek() called\n");
 	file->stream->seek(file->stream, offset, whence);
 	return -1;
 }
@@ -217,12 +209,12 @@ size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *file)
 	unsigned char *p = (unsigned char *) ptr;
 	unsigned int i;
 	size_t j;
-	int a;
+	int b;
 	for (i = 0; i < nmemb; i++) {
 		for (j = 0; j < size; j++) {
-			if ((a = fputc(p[i*size + j], file)) == EOF) break;
+			if ((b = fputc(p[i*size + j], file)) == EOF) break;
 		}
-		if (a == EOF) break;
+		if (b == EOF) break;
 	}
 	return i;
 }
@@ -230,46 +222,46 @@ size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *file)
 int remove(const char *filename)
 {
 	UNUSED(filename);
-	stream_puts(serialout, "remove() called\n");
+	puts("remove() called\n");
 	return -1;
 }
 
 int rename(const char *old_filename, const char *new_filename)
 {
 	UNUSED(old_filename); UNUSED(new_filename);
-	stream_puts(serialout, "rename() called\n");
+	puts("rename() called\n");
 	return -1;
 }
 
 void rewind(FILE *file)
 {
 	UNUSED(file);
-	stream_puts(serialout, "rewind() called\n");
+	puts("rewind() called\n");
 }
 
 void setbuf(FILE *stream, char *buffer)
 {
 	UNUSED(stream); UNUSED(buffer);
-	stream_puts(serialout, "setbuf() called\n");
+	puts("setbuf() called\n");
 }
 
 int setvbuf(FILE *stream, char *buffer, int mode, size_t size)
 {
 	UNUSED(stream); UNUSED(buffer); UNUSED(mode); UNUSED(size);
-	stream_puts(serialout, "setvbuf() called\n");
+	puts("setvbuf() called\n");
 	return -1;
 }
 
 FILE *tmpfile(void)
 {
-	stream_puts(serialout, "tmpfile() called\n");
+	puts("tmpfile() called\n");
 	return NULL;
 }
 
 char *tmpnam(char *str)
 {
 	UNUSED(str);
-	stream_puts(serialout, "tmpnam() called\n");
+	puts("tmpnam() called\n");
 	return NULL;
 }
 
@@ -303,18 +295,6 @@ int printf(const char *format, ...)
 
 int sprintf(char *str, const char *format, ...)
 {
-	/*
-	UNUSED(str); UNUSED(format);
-	str[0] = '1';
-	str[1] = '0';
-	str[2] = '.';
-	str[3] = '0';
-	str[4] = '\0';
-	stream_puts(serialout, format);
-	stream_puts(serialout, " sprintf() called\n");
-	return 1;
-	*/
-
 	va_list ap;
 	int ret;
 
@@ -357,21 +337,21 @@ int vsprintf(char *str, const char *format, va_list arg)
 int fscanf(FILE *stream, const char *format, ...)
 {
 	UNUSED(stream); UNUSED(format);
-	stream_puts(serialout, "fscanf() called\n");
+	puts("fscanf() called\n");
 	return -1;
 }
 
 int scanf(const char *format, ...)
 {
 	UNUSED(format);
-	stream_puts(serialout, "scanf() called\n");
+	puts("scanf() called\n");
 	return -1;
 }
 
 int sscanf(const char *str, const char *format, ...)
 {
 	UNUSED(str); UNUSED(format);
-	stream_puts(serialout, "sscanf() called\n");
+	puts("sscanf() called\n");
 	return -1;
 }
 
