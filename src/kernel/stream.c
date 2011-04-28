@@ -1,3 +1,12 @@
+/*
+ * Jiauliyan OS - Released under the MIT License
+ * Copyright (C) 2011 Paul Booth, Jialiya Huang, Tim Ryan
+ * 
+ * Based on work by Nick Johnson's Rhombus OS, under the OpenBSD license
+ * Copyright (C) 2009, 2010 Nick Johnson <nickbjohnson4224 at gmail.com>
+ * https://github.com/nickbjohnson4224/rhombus/
+ */
+
 #include <stream.h>
 #include <string.h>
 #include <stdlib.h>
@@ -35,9 +44,7 @@ void stream_destroy(stream_s *stream)
 	free(stream);
 }
 
-/*
- * stream impl dummies
- */
+/* stream impl dummies */
 
 int stream_no_get(stream_s *stream)
 {
@@ -160,9 +167,105 @@ unsigned char *bytestream_data(stream_s *stream)
 }
 
 /*
- * formatting
- * modeled after: https://github.com/nickbjohnson4224/rhombus/blob/master/libc/stdio/__format.c
+ * string formatting
  */
+
+#define TYPE_STRING		0		// String
+#define TYPE_CHAR		1		// Character
+#define TYPE_LITERAL	2		// Literal '%"
+#define TYPE_INT		3		// Signed integer
+#define TYPE_UINT		4		// Unsigned integer
+#define TYPE_DOUBLE		5		// Floating point
+
+size_t stream_putbyte(stream_s *stream, unsigned char b)
+{
+	stream->put(stream, b);
+	return 1;
+}
+
+size_t stream_putchar(stream_s *stream, char c)
+{
+	stream->put(stream, (unsigned char) c);
+	return 1;
+}
+
+size_t stream_putstring(stream_s *stream, const char *text)
+{
+	if (text == NULL)
+		text = "(null)";
+		
+	size_t i;
+	for (i = 0; i < strlen(text); i++)
+		stream_putchar(stream, text[i]);
+	return i;
+}
+
+size_t stream_putuint(stream_s *stream, unsigned int value, int flags)
+{
+	/* shortcut */
+	if (value == 0) {
+		return stream_putchar(stream, '0');
+	}
+	
+	const char *digits_lower = "0123456789abcdef";
+	const char *digits_upper = "0123456789ABCDEF";
+	const char *digits = flags & FLAG_UPPER ? digits_upper : digits_lower;
+
+	int base = 10;
+	if (flags & FLAG_OCTAL) 	base = 8;
+	else if (flags & FLAG_HEX) 	base = 16;
+	
+	int len = 0;
+	
+	/* prefixes */
+	if (flags & FLAG_SIGN) {
+		stream_putchar(stream, '+');
+		len++;
+	}
+	if (flags & FLAG_ALT) {
+		if (flags & FLAG_OCTAL) {
+			stream_putchar(stream, '0');
+			len++;
+		}
+		if (flags & FLAG_HEX) {
+			stream_putstring(stream, (flags & FLAG_UPPER) ? "0X" : "0x");
+			len += 2;
+		}
+	}
+
+	/* print digits top down */
+	int i, divisor = 1;
+	for (i = 0; i < 16; i++) {
+		if (divisor * base > (int) value)
+			break;
+		divisor *= base;
+	}
+	for ( ; i >= 0; i--, len++) {
+		stream_putchar(stream, digits[(int) (value / divisor) % base]);
+		divisor /= base;
+	}
+	
+	return len;
+}
+
+size_t stream_putint(stream_s *stream, int value, int flags)
+{
+	size_t len;
+
+	if (value < 0) {
+		stream_putchar(stream, '-');
+		len = stream_putuint(stream, -value, flags) + 1;
+	} else {
+		len = stream_putuint(stream, value, flags);
+	}
+
+	return len;
+}
+
+/**********************************************************************/
+/** double formatting code */
+/** TODO: revise this to be smaller */
+/**********************************************************************/
  
 char *strdup(const char *string)
  {
@@ -307,104 +410,6 @@ size_t strlcat(char *dst, const char *src, size_t siz) {
 
 	return (dlen + (s - src));	/* count does not include NUL */
 }
-
-/**********************************************************************/
-
-#define TYPE_STRING		0		// String
-#define TYPE_CHAR		1		// Character
-#define TYPE_LITERAL	2		// Literal '%"
-#define TYPE_INT		3		// Signed integer
-#define TYPE_UINT		4		// Unsigned integer
-#define TYPE_DOUBLE		5		// Floating point
-
-size_t stream_putbyte(stream_s *stream, unsigned char b)
-{
-	stream->put(stream, b);
-	return 1;
-}
-
-size_t stream_putchar(stream_s *stream, char c)
-{
-	stream->put(stream, (unsigned char) c);
-	return 1;
-}
-
-size_t stream_putstring(stream_s *stream, const char *text)
-{
-	if (text == NULL)
-		text = "(null)";
-		
-	size_t i;
-	for (i = 0; i < strlen(text); i++)
-		stream_putchar(stream, text[i]);
-	return i;
-}
-
-size_t stream_putuint(stream_s *stream, unsigned int value, int flags)
-{
-	/* shortcut */
-	if (value == 0) {
-		return stream_putchar(stream, '0');
-	}
-	
-	const char *digits_lower = "0123456789abcdef";
-	const char *digits_upper = "0123456789ABCDEF";
-	const char *digits = flags & FLAG_UPPER ? digits_upper : digits_lower;
-
-	int base = 10;
-	if (flags & FLAG_OCTAL) 	base = 8;
-	else if (flags & FLAG_HEX) 	base = 16;
-	
-	int len = 0;
-	
-	/* prefixes */
-	if (flags & FLAG_SIGN) {
-		stream_putchar(stream, '+');
-		len++;
-	}
-	if (flags & FLAG_ALT) {
-		if (flags & FLAG_OCTAL) {
-			stream_putchar(stream, '0');
-			len++;
-		}
-		if (flags & FLAG_HEX) {
-			stream_putstring(stream, (flags & FLAG_UPPER) ? "0X" : "0x");
-			len += 2;
-		}
-	}
-
-	/* print digits top down */
-	int i, divisor = 1;
-	for (i = 0; i < 16; i++) {
-		if (divisor * base > (int) value)
-			break;
-		divisor *= base;
-	}
-	for ( ; i >= 0; i--, len++) {
-		stream_putchar(stream, digits[(int) (value / divisor) % base]);
-		divisor /= base;
-	}
-	
-	return len;
-}
-
-size_t stream_putint(stream_s *stream, int value, int flags)
-{
-	size_t len;
-
-	if (value < 0) {
-		stream_putchar(stream, '-');
-		len = stream_putuint(stream, -value, flags) + 1;
-	} else {
-		len = stream_putuint(stream, value, flags);
-	}
-
-	return len;
-}
-
-/**********************************************************************/
-/** double formatting code */
-/**********************************************************************/
 
 static char *__format_uint(unsigned int value, int flags) {
 	char buffer[16];
