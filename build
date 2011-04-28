@@ -1,5 +1,5 @@
+CFLAGS="-Wall -Wextra -m32 -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -nostdlib -nostartfiles -nodefaultlibs -I../src/sys -I../src/libc -I../src/kernel" # -Werror
 # params
-CFLAGS="-Wall -Wextra -m32 -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -nostdlib -nostartfiles -nodefaultlibs -I../src/sys -I../src/libc -I../src/kernel" # -Werror
 CC="gcc"
 
 set -e

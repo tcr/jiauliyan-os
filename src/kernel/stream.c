@@ -64,12 +64,107 @@ int stream_no_seek(stream_s *stream, long pos, int whence)
 }
 
 /*
+ * stream utilities
+ */
+
+size_t stream_write(stream_s *stream, const void *ptr, size_t size)
+{
+	unsigned char *p = (unsigned char *) ptr;
+	size_t i;
+	for (i = 0; i < size; i++) {
+		if (stream->put(stream, *p) == EOF)
+			break;
+		p++;
+	}
+	return i;
+}
+
+/*
+ * byte stream
+ */
+
+typedef struct {
+	unsigned char *buf;
+	long int size;
+	long int capacity;
+	long int pos;
+} bytestream_s;
+
+/* bytestream impl */
+
+static int bytestream_get(stream_s *stream)
+{
+	bytestream_s *data = (bytestream_s *) stream->data;
+	if (data->pos >= data->size)
+		return EOF;
+	return data->buf[data->pos++];
+}
+
+static int bytestream_put(stream_s *stream, unsigned char c)
+{
+	bytestream_s *data = (bytestream_s *) stream->data;
+	
+	// expand file size
+	if (data->pos >= data->capacity) {
+		data->capacity += BUFSIZ;
+		data->buf = (unsigned char *) realloc(data->buf, data->capacity);
+	}
+
+	if (data->pos + 1 > data->size)
+		data->size = data->pos + 1;
+	data->buf[data->pos++] = c;
+	return (int) c;
+}
+
+static int bytestream_seek(stream_s *stream, long pos, int origin)
+{
+	UNUSED(origin);
+	bytestream_s *data = (bytestream_s *) stream->data;
+	data->pos = pos;
+	return 0;
+}
+
+/* bytestream api */
+
+stream_s *bytestream_create(long int capacity)
+{
+	bytestream_s *data = malloc(sizeof(bytestream_s));
+	data->buf = (unsigned char *) malloc(capacity);
+	data->size = 0;
+	data->capacity = capacity;
+	data->pos = 0;
+	stream_s *stream = malloc(sizeof(stream_s));
+	stream->get = bytestream_get;
+	stream->put = bytestream_put;
+	stream->seek = bytestream_seek;
+	stream->data = data;
+	return stream;
+}
+
+void bytestream_destroy(stream_s *stream)
+{
+	free(stream->data);
+	free(stream);
+}
+
+long int bytestream_size(stream_s *stream)
+{
+	bytestream_s *data = (bytestream_s *) stream->data;
+	return data->size;
+}
+
+unsigned char *bytestream_data(stream_s *stream)
+{
+	bytestream_s *data = (bytestream_s *) stream->data;
+	return data->buf;
+}
+
+/*
  * formatting
  * modeled after: https://github.com/nickbjohnson4224/rhombus/blob/master/libc/stdio/__format.c
  */
  
-char *
- strdup(const char *string)
+char *strdup(const char *string)
  {
      char       *nstr;
  
@@ -213,15 +308,7 @@ size_t strlcat(char *dst, const char *src, size_t siz) {
 	return (dlen + (s - src));	/* count does not include NUL */
 }
 
-#define FLAG_SIGN		0x01	// Always show sign
-#define FLAG_LEFT		0x02	// Left align
-#define FLAG_ALT		0x04	// Alternate form
-#define FLAG_ZERO		0x08	// Zero-pad
-#define FLAG_UPPER		0x10	// Upper case
-#define FLAG_OCTAL		0x20	// Octal output
-#define FLAG_HEX		0x40	// Hexadecimal output
-#define FLAG_EXP		0x80	// Use scientific notation
-#define FLAG_MEXP		0x100	// Maybe use scientific notation
+/**********************************************************************/
 
 #define TYPE_STRING		0		// String
 #define TYPE_CHAR		1		// Character
@@ -230,10 +317,94 @@ size_t strlcat(char *dst, const char *src, size_t siz) {
 #define TYPE_UINT		4		// Unsigned integer
 #define TYPE_DOUBLE		5		// Floating point
 
-#define LENGTH_BYTE		0		// char
-#define LENGTH_SHORT	1		// short int
-#define LENGTH_LONG		3		// int or double
-#define LENGTH_LLONG	4		// long long int or long double
+size_t stream_putbyte(stream_s *stream, unsigned char b)
+{
+	stream->put(stream, b);
+	return 1;
+}
+
+size_t stream_putchar(stream_s *stream, char c)
+{
+	stream->put(stream, (unsigned char) c);
+	return 1;
+}
+
+size_t stream_putstring(stream_s *stream, const char *text)
+{
+	if (text == NULL)
+		text = "(null)";
+		
+	size_t i;
+	for (i = 0; i < strlen(text); i++)
+		stream_putchar(stream, text[i]);
+	return i;
+}
+
+size_t stream_putuint(stream_s *stream, unsigned int value, int flags)
+{
+	/* shortcut */
+	if (value == 0) {
+		return stream_putchar(stream, '0');
+	}
+	
+	const char *digits_lower = "0123456789abcdef";
+	const char *digits_upper = "0123456789ABCDEF";
+	const char *digits = flags & FLAG_UPPER ? digits_upper : digits_lower;
+
+	int base = 10;
+	if (flags & FLAG_OCTAL) 	base = 8;
+	else if (flags & FLAG_HEX) 	base = 16;
+	
+	int len = 0;
+	
+	/* prefixes */
+	if (flags & FLAG_SIGN) {
+		stream_putchar(stream, '+');
+		len++;
+	}
+	if (flags & FLAG_ALT) {
+		if (flags & FLAG_OCTAL) {
+			stream_putchar(stream, '0');
+			len++;
+		}
+		if (flags & FLAG_HEX) {
+			stream_putstring(stream, (flags & FLAG_UPPER) ? "0X" : "0x");
+			len += 2;
+		}
+	}
+
+	/* print digits top down */
+	int i, divisor = 1;
+	for (i = 0; i < 16; i++) {
+		if (divisor * base > (int) value)
+			break;
+		divisor *= base;
+	}
+	for ( ; i >= 0; i--, len++) {
+		stream_putchar(stream, digits[(int) (value / divisor) % base]);
+		divisor /= base;
+	}
+	
+	return len;
+}
+
+size_t stream_putint(stream_s *stream, int value, int flags)
+{
+	size_t len;
+
+	if (value < 0) {
+		stream_putchar(stream, '-');
+		len = stream_putuint(stream, -value, flags) + 1;
+	} else {
+		len = stream_putuint(stream, value, flags);
+	}
+
+	return len;
+}
+
+/**********************************************************************/
+/** double formatting code */
+/**********************************************************************/
 
 static char *__format_uint(unsigned int value, int flags) {
 	char buffer[16];
@@ -297,7 +468,7 @@ static char *__format_int(int value, int flags) {
 
 	return string;
 }
-	
+
 static char *__format_double_frac(long double value, int flags, int precision) {
 	char *string;
 	int i;
@@ -438,12 +609,23 @@ static char *__format_double(long double value, int flags, int precision) {
 	return string;
 }
 
-char *__format(const char **_fmt, va_list *argp) {
+size_t stream_putdouble(stream_s *stream, long double value, int precision, int flags)
+{
+	char *string = __format_double(value, flags, precision);
+	size_t len = strlen(string);
+	stream_putstring(stream, string);
+	free(string);
+	return len;
+}
+
+/**********************************************************************/
+/**********************************************************************/
+
+static size_t stream_format_arg(stream_s *stream, const char **_fmt, va_list *argp)
+{
 	int flags, type, length;
 	size_t width, precision;
 	const char *fmt = *_fmt;
-	char *string;
-	char *string1;
 
 	long double val_d;
 	int val_i;
@@ -557,8 +739,8 @@ char *__format(const char **_fmt, va_list *argp) {
 		type = TYPE_DOUBLE;
 		flags |= FLAG_EXP;
 		break;
-	case 'X': case 'p': flags |= FLAG_UPPER;
-	case 'x':
+	case 'X': flags |= FLAG_UPPER;
+	case 'x': case 'p': 
 		type = TYPE_UINT;
 		flags |= FLAG_HEX;
 		break;
@@ -592,245 +774,81 @@ char *__format(const char **_fmt, va_list *argp) {
 		else						val_d = va_arg(*argp, double);
 		break;
 	}
+	
+	/* create bytestream */
+	stream_s *bs = bytestream_create(BUFSIZ);
 
 	/* format value */
 	switch (type) {
 	case TYPE_STRING:
-		if (!val_s) string = strdup("(null)");
-		else string = strdup(val_s);
+		stream_putstring(bs, val_s);
 		break;
 	case TYPE_CHAR: case TYPE_LITERAL:
-		string = malloc(sizeof(char) * 2);
-		string[0] = val_c;
-		string[1] = '\0';
+		stream_putchar(bs, val_c);
 		break;
 	case TYPE_INT:
-		string = __format_int(val_i, flags);
+		stream_putint(bs, val_i, flags);
 		break;
 	case TYPE_UINT:
-		string = __format_uint(val_u, flags);
+		stream_putuint(bs, val_u, flags);
 		break;
 	case TYPE_DOUBLE:
-		string = __format_double(val_d, flags, precision);
+		stream_putdouble(bs, val_d, precision, flags);
 		break;
 	}
-
-	if (strlen(string) < width) {
-		string1 = malloc(sizeof(char) * (width + 1));
-
-		if (flags & FLAG_LEFT) {
-			strlcpy(string1, string, width + 1);
-
-			if (flags & FLAG_ZERO) {
-				strlcat(string1, "000000000000000000000000", width + 1);
-			}
-			else {
-				strlcat(string1, "                        ", width + 1);
-			}
-		}
-		else {
-			if (flags & FLAG_ZERO) {
-				strlcpy(string1, "000000000000000000000000", width - strlen(string) + 1);
-			}
-			else {
-				strlcpy(string1, "                        ", width - strlen(string) + 1);
-			}
-
-			strlcat(string1, string, width + 1);
-		}
-
-		free(string);
-	}
-	else {
-		string1 = string;
+	
+	/* get string data */
+	size_t flen = bytestream_size(bs) - 1;
+	char *fstr = (char *) bytestream_data(bs);
+	
+	if (flen < width) {
+		if (flags & FLAG_LEFT)
+			stream_putstring(stream, fstr);
+			
+		size_t i;
+		for (i = 0; i < width - flen; i++)
+			stream_putchar(stream, (flags & FLAG_ZERO) ? '0' : ' ');
+			
+		if (!(flags & FLAG_LEFT))
+			stream_putstring(stream, fstr);
+	} else {
+		stream_putstring(stream, fstr);
 	}
 
 	*_fmt = fmt;
-	return string1;
+	
+	return flen < width ? width : flen;
 }
 
-size_t stream_write(stream_s *stream, const void *ptr, size_t size)
+size_t stream_vformat(stream_s *stream, const char *format, va_list ap)
 {
-	unsigned char *p = (unsigned char *) ptr;
-	size_t i;
-	for (i = 0; i < size; i++) {
-		if (stream->put(stream, *p) == EOF)
-			break;
-		p++;
-	}
-	return i;
-}
-
-int stream_vformat(stream_s *stream, const char *format, va_list ap)
-{
-	size_t i, fbt;
-	char *fmtbuffer;
+	size_t i, count = 0;
 	const char *format_tmp;
-	char *string;
-
-	fmtbuffer = malloc(sizeof(char) * (strlen(format) + 1));
-	fbt = 0;
 
 	for (i = 0; format[i]; i++) {
-		if (format[i] == '%') {
-			stream_write(stream, fmtbuffer, fbt);
-			fbt = 0;
+		if (format[i] != '%') {
+			/* push non-formatting option */
+			stream->put(stream, (unsigned char) format[i]);
+			count++;
+			continue;
+		}
 
-			format_tmp = &format[i];
-			string = __format(&format_tmp, &ap);
-			i = (uintptr_t) format_tmp - (uintptr_t) format;
-			if (!string)
-				continue;
-			
-			//fwrite(string, strlen(string), sizeof(char), stream);
-			stream_write(stream, string, strlen(string));
-			free(string);
-		}
-		else {
-			fmtbuffer[fbt++] = format[i];
-		}
+		format_tmp = &format[i]; /* format string location */
+		count += stream_format_arg(stream, &format_tmp, &ap);
+		i = (uintptr_t) format_tmp - (uintptr_t) format;
 	}
-	
-	//fwrite(fmtbuffer, fbt, sizeof(char), stream);
-	stream_write(stream, fmtbuffer, fbt);
-	free(fmtbuffer);
 
 	return 0;
 } 
 
-/*
-int stream_format(stream_s *stream, concat char * format, ...)
+size_t stream_format(stream_s *stream, const char *format, ...)
 {
-	
-}
-*/
+	va_list ap;
+	int ret;
 
-/* put a string */
-size_t stream_puts(stream_s *stream, const char *text)
-{
-	size_t i;
-	for (i = 0; i < strlen(text); i++)
-		stream_putc(stream, text[i]);
-	return 1;
-}
+	va_start(ap, format);
+	ret = stream_vformat(stream, format, ap);
+	va_end(ap);
 
-/* put a decimal integer */
-void stream_puti(stream_s *stream, unsigned int a)
-{
-	unsigned int l = 0, b = a;
-	while (b / 10 > 0) {
-		l++;
-		b /= 10;
-	}
-	do {
-		/* print highest digit */
-		unsigned int b = a, d = 1;
-		while ((b / 10) > 0) {
-			d *= 10;
-			b /= 10;
-		}
-		stream_putc(stream, 0x30 + b);
-	
-		/* print rest */
-		while (a >= d)
-			a -= d;
-	} while (l--);
-}
-
-/* put a hex char */
-void stream_puthc(stream_s *stream, unsigned char h)
-{
-	int b = h & 0xF, a = (h >> 4) & 0xF;
-	stream_putc(stream, a > 0x9 ? 0x61 - 0x0A + a : 0x30 + a);
-	stream_putc(stream, b > 0x9 ? 0x61 - 0x0A + b : 0x30 + b);
-}
-
-/* put a pointer */
-void stream_putp(stream_s *stream, void *p)
-{
-	int i, siz = sizeof(void *);
-	stream_puts(stream, "0x");
-	for (i = siz - 1; i >= 0; i--) {
-		stream_puthc(stream, (((int) p) >> (i*8)) & 0xFF);
-	}
-}
-
-/*
- * byte stream
- */
-
-typedef struct {
-	unsigned char *buf;
-	long int size;
-	long int capacity;
-	long int pos;
-} bytestream_s;
-
-/* bytestream impl */
-
-static int bytestream_get(stream_s *stream)
-{
-	bytestream_s *data = (bytestream_s *) stream->data;
-	if (data->pos >= data->size)
-		return EOF;
-	return data->buf[data->pos++];
-}
-
-static int bytestream_put(stream_s *stream, unsigned char c)
-{
-	bytestream_s *data = (bytestream_s *) stream->data;
-	
-	// expand file size
-	if (data->pos >= data->capacity) {
-		data->capacity += 1024;
-		data->buf = (unsigned char *) realloc(data->buf, data->capacity);
-	}
-
-	if (data->pos + 1 > data->size)
-		data->size = data->pos + 1;
-	data->buf[data->pos++] = c;
-	return (int) c;
-}
-
-static int bytestream_seek(stream_s *stream, long pos, int origin)
-{
-	UNUSED(origin);
-	bytestream_s *data = (bytestream_s *) stream->data;
-	data->pos = pos;
-	return 0;
-}
-
-/* bytestream api */
-
-stream_s *bytestream_create(long int capacity)
-{
-	bytestream_s *data = malloc(sizeof(bytestream_s));
-	data->buf = (unsigned char *) malloc(capacity);
-	data->size = 0;
-	data->capacity = capacity;
-	data->pos = 0;
-	stream_s *stream = malloc(sizeof(stream_s));
-	stream->get = bytestream_get;
-	stream->put = bytestream_put;
-	stream->seek = bytestream_seek;
-	stream->data = data;
-	return stream;
-}
-
-void bytestream_destroy(stream_s *stream)
-{
-	free(stream->data);
-	free(stream);
-}
-
-long int bytestream_size(stream_s *stream)
-{
-	bytestream_s *data = (bytestream_s *) stream->data;
-	return data->size;
-}
-
-unsigned char *bytestream_data(stream_s *stream)
-{
-	bytestream_s *data = (bytestream_s *) stream->data;
-	return data->buf;
+	return ret;
 }

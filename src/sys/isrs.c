@@ -4,6 +4,7 @@
 *
 *  Notes: No warranty expressed or implied. Use at own risk. */
 #include <system.h>
+#include <common.h>
 #include <vga.h>
 
 /* These are function prototypes for all of the exception
@@ -143,8 +144,8 @@ void fault_handler(struct regs *r)
 {
     if (r->int_no < 32)
     {
-        stream_puts(vgaout, exception_messages[r->int_no]);
-        stream_puts(vgaout, " Exception. System Halted!\n");
+        FATAL(exception_messages[r->int_no]);
+        FATAL(" Exception. System Halted!\n");
         for (;;);
     }
 }

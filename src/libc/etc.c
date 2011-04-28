@@ -20,7 +20,7 @@
 sighandler_t signal(int signum, sighandler_t handler)
 {
 	UNUSED(signum); UNUSED(handler);
-	stream_puts(serialout, "signal() called.\n");
+	WARN("signal() called.\n");
 	return NULL;
 }
 
@@ -39,7 +39,7 @@ char *getenv(const char *name)
 void exit(int exit_code)
 {
 	UNUSED(exit_code);
-	stream_puts(serialout, "exit() called.\n");
+	WARN("exit() called.\n");
 	printf("\n[EXIT] %s", strerror(exit_code));
 	while(1);
 }
@@ -47,7 +47,7 @@ void exit(int exit_code)
 int system(const char *string)
 {
 	UNUSED(string);
-	stream_puts(serialout, "system() called.\n");
+	WARN("system() called.\n");
 	return 1;
 }
 
@@ -228,53 +228,53 @@ unsigned long strtoul(char *nptr, char **endptr, int base)
 struct tm *gmtime(const time_t *timer)
 {
 	UNUSED(timer);
-	stream_puts(serialout, "gmtime() called.\n");
+	WARN("gmtime() called.\n");
 	return NULL;
 }
 
 struct tm *localtime(const time_t *timer)
 {
 	UNUSED(timer);
-	stream_puts(serialout, "localtime() called.\n");
+	WARN("localtime() called.\n");
 	return NULL;
 }
 
 clock_t clock(void)
 {
-	stream_puts(serialout, "clock() called.\n");
+	WARN("clock() called.\n");
 	return 0;
 }
 
 time_t time(time_t *timeptr)
 {
 	UNUSED(timeptr);
-	stream_puts(serialout, "time() called.\n");
+	WARN("time() called.\n");
 	return 0;
 }
 
 struct lconv *localeconv(void)
 {
-	stream_puts(serialout, "localeconv() called.\n");
+	WARN("localeconv() called.\n");
 	return NULL;
 }
 
 char *setlocale(int category, const char *locale)
 {
 	UNUSED(category); UNUSED(locale);
-	stream_puts(serialout, "setlocale() called.\n");
+	WARN("setlocale() called.\n");
 	return (char *) locale;
 }
 
 time_t mktime(struct tm *tmbuf)
 {
 	UNUSED(tmbuf);
-	stream_puts(serialout, "mktime() called.\n");
+	WARN("mktime() called.\n");
 	return 0;
 }
 
 size_t strftime(char *s, size_t maxsize, const char *format, const struct tm *t)
 {
 	UNUSED(s); UNUSED(maxsize); UNUSED(format); UNUSED(t);
-	stream_puts(serialout, "strftime() called.\n");
+	WARN("strftime() called.\n");
 	return 0;
 }
