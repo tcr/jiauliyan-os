@@ -56,8 +56,6 @@ void kernel_start()
 	puts("Address of kernel_start(): ");
 	stream_putpointer(vgaout, &kernel_start);
 	putchar('\n');
-	
-	printf("%12f\n", 45.509);
 
 	/*
 	puts("Testing write to serial port...\n");

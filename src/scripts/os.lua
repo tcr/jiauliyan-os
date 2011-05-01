@@ -2,53 +2,64 @@ json = require("dkjson").json
 
 print("Loading lua code...")
 
--- sends a serial message with two bytes for length and then input
-
-function send_message(msg)
-	serial.send(string.char(math.floor(msg:len() / 256), msg:len() % 256) .. msg)
-end
+--[[--------------------------------------------------------------------
+Serial Communication
+----------------------------------------------------------------------]]
 
 -- serial message polling
 -- format: two bytes describing message size (<65536b) then listens for
 -- message; returns true if message is received and on_receive() is called
 -- else, false
 
-local serin = ""
+__message_responses = {}
+__serin = ""
 
-function check_serial_input()
-	serin = serin .. serial.receive_all()
-	if serin:len() > 2 then
-		local l = serin:byte(1)*256 + serin:byte(2)
-		if serin:len() >= l + 2 then
-			if not pcall(function () on_receive(json.decode(serin:sub(3, l + 3))) end) then
-				print("[ERROR] Bad input.")
-			end
-			serin = serin:sub(l + 3)
-			return true
+function handle_message(msg)
+	local id = msg:byte(1)*256 + msg:byte(2)
+	if not pcall(function () __message_responses[id] = json.decode(msg:sub(3)) end) then
+		print("[ERROR] Bad message.")
+	end
+	return id
+end
+
+function poll_for_message()
+	__serin = __serin .. serial.receive_all()
+	if __serin:len() > 2 then
+		local l = __serin:byte(1)*256 + __serin:byte(2)
+		if __serin:len() >= l + 2 then
+			retid = handle_message(__serin:sub(3, l + 2))
+			__serin = __serin:sub(l + 3)
+			return retid
 		end
 	end
-	return false
+	return -1
+end
+
+-- sends a serial message with two bytes for length and then input
+
+local __send_message_id = 1;
+
+function send_message(msg, wait, callback)
+	serial.send(string.char(math.floor(msg:len() / 256), msg:len() % 256) ..
+		string.char(math.floor(__send_message_id / 256), __send_message_id % 256) ..
+		msg)
+	if wait then
+		repeat until poll_for_message() == __send_message_id
+		callback(__message_responses[__send_message_id])
+		__message_responses[__send_message_id] = nil
+	end
+	__send_message_id = __send_message_id + 1
+end
+
+-- http requests over serial
+
+function send_http_req(method, url, data, callback)
+	send_message(json.encode({action='httpreq', method=method, url=url}), true, callback)
 end
 
 --[[--------------------------------------------------------------------
 Jiauliyan OS Lua Command Line
 ----------------------------------------------------------------------]]
-
--- on serial message received
--- msg has been decoded from JSON
-
-function on_receive(msg)
-	if msg['action'] == 'httpreq' then
-		print(msg['result'])
---		for i,v in ipairs(msg) do
---			print("Tweet:")
---		end
-	elseif msg['action'] == 'httpimage' then
-		print(msg['result'])
-	else
-		print("Cannot handle action \"" .. msg['action'] .. '"')
-	end
-end
 
 -- Command line interface loop
 -- Executes command as the user enters them
@@ -86,15 +97,41 @@ function cli()
 		elseif cmd == "sudo make me a sandwich" then
 			print("Make it yoself")
 		elseif prog == "fetch" then
-			send_message(json.encode({action='httpreq', method='get', url='http://' .. (cmdp[2] or '')}))
-			repeat until check_serial_input()
+			send_http_req('get', cmdp[2] or '', nil, function (msg)
+					if not msg or msg['code'] ~= "200" then
+						print("Error: could not send request.")
+					else
+						print(msg['body'])
+					end
+				end)
 		elseif prog == "get-tweets" then
 			print("Fetching tweets...")
-			send_message(json.encode({action='httpreq', method='get', url='http://identi.ca/api/statuses/friends_timeline/tiles.json'}))
+			send_http_req('get', 'http://identi.ca/api/statuses/friends_timeline/tiles.json', nil, function (msg)
+					print(msg)
+				end)
 			repeat until check_serial_input()
 		elseif prog == "image" then
-			send_message(json.encode({action='httpimage', method='get', url=cmdp[2] or ''}))
-			repeat until check_serial_input()
+			send_http_req('get', 'http://asahina.co.cc/breeze/image.py?' .. (cmdp[2] or ''), nil, function (msg)
+					if not msg or msg['code'] ~= "200" then
+						print('Could not display image.')
+						return
+					end
+					
+					local d = msg['body']
+					for i=3,#d,3 do
+						ch = d:sub(i,i)
+						anc = string.byte("a", 1)
+						bg = d:byte(i-2) - anc
+						fg = d:byte(i-1) - anc
+						if ch ~= "\n" then
+							vga.setbg(bg)
+							vga.setfg(fg)
+							io.write(ch)
+						end
+					end
+					vga.setbg(vga.DARK_GREY)
+					vga.setfg(vga.WHITE)
+				end)
 		else
 			print("Unrecognized command: " .. cmd)
 		end
