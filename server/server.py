@@ -14,6 +14,8 @@ n = sys.argv[1]
 sr = io.FileIO("/dev/pts/" + n, "r")
 sw = io.FileIO("/dev/pts/" + n, "w")
 
+print "Launched HTTP serial server foir /dev/pts/" + n + "..."
+
 def on_receive(id, act):
 	# "act" is a JSON variable with a value "action" and then other
 	# parameters attached to it
@@ -23,16 +25,18 @@ def on_receive(id, act):
 			act['method'] if act.has_key('method') else 'GET',
 			body=act['body'] if act.has_key('body') else None,
 			headers=act['headers'] if act.has_key('headers') else None)
-		send_json(id, {"action": "httpreq", 'code': resp['status'], "body": content})
 		print content
+		send_message(id, mark_len(json.dumps({"action": "httpreq", 'code': resp['status']})) + mark_len(content))
 		print "Data sent."
 	else:
 		print "Unrecognized action \"" + act['action'] + "\""
 
-def send_json(id, data):
-	msg = chr(id >> 8) + chr(id & 0xFF) + json.dumps(data)
-	p = chr(len(msg) >> 8) + chr(len(msg) & 0xFF)
-	sw.write(p + msg)
+def mark_len(msg):
+	return chr(len(msg) >> 8) + chr(len(msg) & 0xFF) + msg
+
+def send_message(id, msg):
+	msg = chr(id >> 8) + chr(id & 0xFF) + msg
+	sw.write(mark_len(msg))
 
 while True:
 	r = sr.read(2)

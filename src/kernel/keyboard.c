@@ -163,6 +163,11 @@ void keyboard_interrupt(struct regs *r)
 	    } else if (scancode == 58) {
 		    capslock = !capslock;
 		    shift_pressed += -1 + 2 * (capslock);
+	    } else if (scancode == 14) {
+		    keyboard_buf[keyboard_buf_len++] = '\b';
+		    vga_putchar('\b');
+		    vga_putchar(' ');
+		    vga_putchar('\b');
 	    } else {
 		    keyboard_buf[keyboard_buf_len++] = kbdus[scancode + 
 							     (shift_pressed > 0)

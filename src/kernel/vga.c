@@ -78,6 +78,15 @@ void vga_cls()
 	move_csr();
 }
 
+/* Puts a single character at a defined location on screen */
+
+void vga_placechar(char c, int x, int y)
+{
+	unsigned att = attrib << 8;
+	unsigned short *where = textmemptr + (y * 80 + x);
+	*where = c | att;	/* Character AND attributes: color */
+}
+
 /* Puts a single character on the screen */
 void vga_putchar(char c)
 {
