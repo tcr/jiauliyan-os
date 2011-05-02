@@ -157,7 +157,11 @@ void keyboard_interrupt(struct regs *r)
 		    capslock = !capslock;
 		    shift_pressed += -1 + 2 * (capslock);
 	    } else {
-		    keyboard_buf[keyboard_buf_len++] = kbdus[scancode + (shift_pressed > 0) * 90];
+		    keyboard_buf[keyboard_buf_len++] = kbdus[scancode + 
+							     (shift_pressed > 0)
+							     * 90]; 
+/* 90 because that is the length of our kbdus array without shift. 
+the rest to 128 are undefined. */
 		    /* display to screen */
 		    vga_putchar(kbdus[scancode + (shift_pressed > 0) * 90]);
 
