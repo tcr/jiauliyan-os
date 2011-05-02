@@ -1,3 +1,9 @@
+/*
+ * Jiauliyan OS - Released under the MIT License
+ * Copyright (C) 2011 Paul Booth, Jialiya Huang, Tim Ryan
+ * https://github.com/timcameronryan/jiauliyan
+ */
+ 
 #ifndef __STREAM_H
 #define __STREAM_H
 
@@ -14,7 +20,7 @@
 #define _IOLBF          0x001
 #define _IONBF          0x002
 
-#define BUFSIZ 1024*8
+#define BUFSIZ 1024
 
 typedef struct __stream {
 	int (*get)(struct __stream *stream); // reads a character
@@ -37,15 +43,36 @@ extern int stream_no_put(stream_s *stream, unsigned char s);
 extern long int stream_no_avail(stream_s *stream);
 extern int stream_no_seek(stream_s *stream, long pos, int whence);
 
-extern int stream_format(stream_s *stream, const char *format, ...);
-extern int stream_vformat(stream_s *stream, const char *format, va_list ap);
+/*
+ * formatting
+ */
 
-#define stream_putb(S, C) S->put(S, (unsigned char) C)
-#define stream_putc(S, C) S->put(S, (char) C)
-extern size_t stream_puts(stream_s *stream, const char *str);
-extern void stream_puti(stream_s *stream, unsigned int i);
-extern void stream_puthc(stream_s *stream, unsigned char c);
-extern void stream_putp(stream_s *stream, void *p);
+#define FLAG_SIGN		0x01	// Always show sign
+#define FLAG_LEFT		0x02	// Left align
+#define FLAG_ALT		0x04	// Alternate form
+#define FLAG_ZERO		0x08	// Zero-pad
+#define FLAG_UPPER		0x10	// Upper case
+#define FLAG_OCTAL		0x20	// Octal output
+#define FLAG_HEX		0x40	// Hexadecimal output
+#define FLAG_EXP		0x80	// Use scientific notation
+#define FLAG_MEXP		0x100	// Maybe use scientific notation
+
+#define LENGTH_BYTE		0		// char
+#define LENGTH_SHORT	1		// short int
+#define LENGTH_LONG		3		// int or double
+#define LENGTH_LLONG	4		// long long int or long double
+
+extern size_t stream_putbyte(stream_s *stream, unsigned char b);
+extern size_t stream_putchar(stream_s *stream, char c);
+extern size_t stream_putstring(stream_s *stream, const char *str);
+extern size_t stream_putint(stream_s *stream, int i, int flags);
+extern size_t stream_putuint(stream_s *stream, unsigned int i, int flags);
+extern size_t stream_putdouble(stream_s *stream, long double value, int precision, int flags);
+extern size_t stream_puthc(stream_s *stream, unsigned char c);
+#define stream_putpointer(S, P) stream_format(S, "%#p", P)
+
+extern size_t stream_format(stream_s *stream, const char *format, ...);
+extern size_t stream_vformat(stream_s *stream, const char *format, va_list ap);
 
 /* bytestream */
 extern stream_s *bytestream_create(long int capacity);

@@ -190,13 +190,13 @@ size_t fread(void *ptr, size_t size, size_t nmemb, FILE *file)
 FILE *freopen(const char *filename, const char *mode, FILE *stream)
 {
 	UNUSED(filename); UNUSED(mode); UNUSED(stream);
-	puts("freopen() called\n");
+	WARN("freopen() called\n");
 	return NULL;
 }
 
 int fseek(FILE *file, long int offset, int whence)
 {
-	puts("fseek() called\n");
+	WARN("fseek() called\n");
 	file->stream->seek(file->stream, offset, whence);
 	return -1;
 }
@@ -225,46 +225,46 @@ size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *file)
 int remove(const char *filename)
 {
 	UNUSED(filename);
-	puts("remove() called\n");
+	WARN("remove() called\n");
 	return -1;
 }
 
 int rename(const char *old_filename, const char *new_filename)
 {
 	UNUSED(old_filename); UNUSED(new_filename);
-	puts("rename() called\n");
+	WARN("rename() called\n");
 	return -1;
 }
 
 void rewind(FILE *file)
 {
 	UNUSED(file);
-	puts("rewind() called\n");
+	WARN("rewind() called\n");
 }
 
 void setbuf(FILE *stream, char *buffer)
 {
 	UNUSED(stream); UNUSED(buffer);
-	puts("setbuf() called\n");
+	WARN("setbuf() called\n");
 }
 
 int setvbuf(FILE *stream, char *buffer, int mode, size_t size)
 {
 	UNUSED(stream); UNUSED(buffer); UNUSED(mode); UNUSED(size);
-	puts("setvbuf() called\n");
+	WARN("setvbuf() called\n");
 	return -1;
 }
 
 FILE *tmpfile(void)
 {
-	puts("tmpfile() called\n");
+	WARN("tmpfile() called\n");
 	return NULL;
 }
 
 char *tmpnam(char *str)
 {
 	UNUSED(str);
-	puts("tmpnam() called\n");
+	WARN("tmpnam() called\n");
 	return NULL;
 }
 
@@ -325,7 +325,7 @@ int vsprintf(char *str, const char *format, va_list arg)
 	stream_s *bs = bytestream_create(1024);
 	int ret = stream_vformat(bs, format, arg);
 	if (ret >= 0) {
-		stream_putc(bs, '\0');
+		stream_putchar(bs, '\0');
 		unsigned char *bs_str = bytestream_data(bs);
 		strncpy(str, (char *) bs_str, (size_t) bytestream_size(bs));
 	}
@@ -340,21 +340,21 @@ int vsprintf(char *str, const char *format, va_list arg)
 int fscanf(FILE *stream, const char *format, ...)
 {
 	UNUSED(stream); UNUSED(format);
-	puts("fscanf() called\n");
+	WARN("fscanf() called\n");
 	return -1;
 }
 
 int scanf(const char *format, ...)
 {
 	UNUSED(format);
-	puts("scanf() called\n");
+	WARN("scanf() called\n");
 	return -1;
 }
 
 int sscanf(const char *str, const char *format, ...)
 {
 	UNUSED(str); UNUSED(format);
-	puts("sscanf() called\n");
+	WARN("sscanf() called\n");
 	return -1;
 }
 
@@ -401,7 +401,7 @@ int fputc(int c, FILE *file)
 		return EOF;
 		
 	file->pos++;
-	return stream_putc(file->stream, (char) c);
+	return stream_putchar(file->stream, (char) c);
 }
 
 int fputs(const char *string, FILE *file)
@@ -410,7 +410,7 @@ int fputs(const char *string, FILE *file)
 		return EOF;
 		
 	file->pos += strlen(string) + 1;
-	return stream_puts(file->stream, string);
+	return stream_putstring(file->stream, string);
 }
 
 int ungetc(int c, FILE *file)

@@ -1,3 +1,9 @@
+/*
+ * Jiauliyan OS - Released under the MIT License
+ * Copyright (C) 2011 Paul Booth, Jialiya Huang, Tim Ryan
+ * https://github.com/timcameronryan/jiauliyan
+ */
+
 #include <system.h>
 #include <common.h>
 #include <string.h>

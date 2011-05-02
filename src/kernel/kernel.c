@@ -54,11 +54,13 @@ void kernel_start()
 	puts("An OS by some cool dudes\n\n");
 
 	puts("Address of kernel_start(): ");
-	stream_putp(vgaout, &kernel_start);
+	stream_putpointer(vgaout, &kernel_start);
 	putchar('\n');
 
+	/*
 	puts("Testing write to serial port...\n");
-	stream_puts(serialout, "[SERIAL] Testing serial ports from Jiauliyan OS!\n");
+	stream_putstring(serialout, "[SERIAL] Testing serial ports from Jiauliyan OS!\n");
+	*/
 
 	/*
 	puts("Waiting timer for 100 clicks:\n");

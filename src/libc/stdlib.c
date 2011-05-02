@@ -43,13 +43,13 @@ typedef struct header {
 static Header base; /* root block */
 static Header *freep = NULL; /* start of free block list */
 
-void* malloc(unsigned nbytes)
+void* malloc(size_t nbytes)
 {
 	if (nbytes == 0)
 		return NULL;
 	
 	/* round number of units up to block size */
-    unsigned nunits = BLOCK_ALIGN(nbytes);
+    size_t nunits = BLOCK_ALIGN(nbytes);
 
     Header *prevp;
     if ((prevp = freep) == NULL) {
