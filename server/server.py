@@ -18,10 +18,13 @@ def on_receive(id, act):
 	# "act" is a JSON variable with a value "action" and then other
 	# parameters attached to it
 	if act['action'] == 'httpreq':
-		print "HTTP Request " + act['url'] + ":"
-		resp, content = http.request(act['url'])
-		print resp
+		sys.stdout.write("HTTP " + act['method'] + " " + act['url'] + ": ")
+		resp, content = http.request(act['url'],
+			act['method'] if act.has_key('method') else 'GET',
+			body=act['body'] if act.has_key('body') else None,
+			headers=act['headers'] if act.has_key('headers') else None)
 		send_json(id, {"action": "httpreq", 'code': resp['status'], "body": content})
+		print content
 		print "Data sent."
 	else:
 		print "Unrecognized action \"" + act['action'] + "\""
@@ -33,14 +36,13 @@ def send_json(id, data):
 
 while True:
 	r = sr.read(2)
-	print "[DEBUG] Start message: " + str(r)
+	#print "[DEBUG] Start message: " + str(r)
 	l = (ord(r[0]) << 8) + ord(r[1])
 	print "Receiving command of length " + str(l)
 
 	data = ""
 	while len(data) < l + 2:
 		data += str(sr.read(l + 2 - len(data)))
-		print " . read " + str(len(data))
 	print "Command (length " + str(len(data[2:])) + "): " + data[2:]
 
 	# parse message

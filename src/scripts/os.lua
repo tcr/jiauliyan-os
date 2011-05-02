@@ -51,10 +51,30 @@ function send_message(msg, wait, callback)
 	__send_message_id = __send_message_id + 1
 end
 
+--[[--------------------------------------------------------------------
+HTTP lib
+----------------------------------------------------------------------]]
+
 -- http requests over serial
 
-function send_http_req(method, url, data, callback)
-	send_message(json.encode({action='httpreq', method=method, url=url}), true, callback)
+function send_http_req(method, url, headers, body, callback)
+	send_message(json.encode({action='httpreq', method=method, headers=headers, body=body, url=url}), true, callback)
+end
+
+function url_encode(s)
+	s = string.gsub(s, "([&=+%c])", function (c)
+		return string.format("%%%02X", string.byte(c))
+	end)
+	s = string.gsub(s, " ", "+")
+	return s
+end
+
+function url_encode_table(t)
+	local s = ""
+	for k,v in pairs(t) do
+		s = s .. "&" .. url_encode(k) .. "=" .. url_encode(v)
+	end
+	return string.sub(s, 2)     -- remove first `&'
 end
 
 --[[--------------------------------------------------------------------
@@ -97,7 +117,7 @@ function cli()
 		elseif cmd == "sudo make me a sandwich" then
 			print("Make it yoself")
 		elseif prog == "fetch" then
-			send_http_req('get', cmdp[2] or '', nil, function (msg)
+			send_http_req('GET', cmdp[2] or '', nil, nil, function (msg)
 					if not msg or msg['code'] ~= "200" then
 						print("Error: could not send request.")
 					else
@@ -105,13 +125,33 @@ function cli()
 					end
 				end)
 		elseif prog == "get-tweets" then
-			print("Fetching tweets...")
-			send_http_req('get', 'http://identi.ca/api/statuses/friends_timeline/tiles.json', nil, function (msg)
-					print(msg)
+			send_http_req('GET', 'http://identi.ca/api/statuses/friends_timeline/jiauliyan.json', nil, nil, function (msg)
+					if not msg or msg['code'] ~= "200" then
+						print("Error: could not receive tweets.")
+					else
+						for i,v in ipairs(json.decode(msg['body'])) do
+							print("----------------------------------------")
+							print("@" .. v['user']['screen_name'] .. ": " .. v['text'])
+						end
+					end
 				end)
-			repeat until check_serial_input()
+		elseif prog == "send-tweet" then
+			send_http_req('POST', 'http://identi.ca/api/statuses/update.json',
+				{["Authorization"]="Basic amlhdWxpeWFuOm9saW5oYXNub3RyZWVz",
+				 ["Content-Type"]="application/x-www-form-urlencoded"},
+				url_encode_table({status=string.sub(cmd, string.len("send-tweet "), string.len("send-tweet ") + 140)}),
+				function (msg)
+					if not msg or msg['code'] ~= "200" then
+						print("Error: could not receive tweets.")
+					else
+						for i,v in ipairs(json.decode(msg['body'])) do
+							print("----------------------------------------")
+							print("@" .. v['user']['screen_name'] .. ": " .. v['text'])
+						end
+					end
+				end)
 		elseif prog == "image" then
-			send_http_req('get', 'http://asahina.co.cc/breeze/image.py?' .. (cmdp[2] or ''), nil, function (msg)
+			send_http_req('GET', 'http://asahina.co.cc/breeze/image.py?' .. (cmdp[2] or ''), nil, nil, function (msg)
 					if not msg or msg['code'] ~= "200" then
 						print('Could not display image.')
 						return
