@@ -4,7 +4,7 @@
 #include <common.h>
 
 #define PORT 0x3f8   /* COM1 */
-#define SERIAL_BUF_SIZE 1024*4
+#define SERIAL_BUF_SIZE 1024*128
 
 /*
  * serial port
@@ -108,7 +108,7 @@ void serial_install()
 {
 	outportb(PORT + 1, 0x01);    // enable Received Data Available interrupt
 	outportb(PORT + 3, 0x80);    // Enable DLAB (set baud rate divisor)
-	outportb(PORT + 0, 0x01);    // Set divisor to 1 (lo byte) 38400 baud
+	outportb(PORT + 0, 0x03);    // Set divisor to 3 (lo byte) 38400 baud
 	outportb(PORT + 1, 0x00);    //                  (hi byte) * 3
 	outportb(PORT + 3, 0x03);    // 8 bits, no parity, one stop bit
 	outportb(PORT + 2, 0xC7);    // Enable FIFO, clear them, with 14-byte threshold

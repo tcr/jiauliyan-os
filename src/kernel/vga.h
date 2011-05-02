@@ -4,6 +4,7 @@
 #include <stream.h>
 
 extern void vga_cls();
+extern void vga_placechar(char c, int x, int y);
 extern void vga_putchar(char c);
 extern void vga_setbg(unsigned char bg);
 extern void vga_setfg(unsigned char fg);

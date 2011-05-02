@@ -85,6 +85,18 @@ int lua_vga_setbg(lua_State *L)
 	return 0;
 }
 
+int lua_vga_placechar(lua_State *L)
+{
+	const char *str;
+	size_t      len;
+
+	str = luaL_checklstring(L, 1, &len);
+	int x = (int) lua_tonumber(L, 2);
+	int y = (int) lua_tonumber(L, 3);
+	vga_placechar(str[0], x, y);
+	return 0;
+}
+
 /*
  * initializer
  */
@@ -115,6 +127,7 @@ int luaopen_kernel(lua_State *L)
 	
 	/* vga binding */
     lua_newtable(L);
+	lua_setfield_function(L, "placechar", lua_vga_placechar);
 	lua_setfield_function(L, "setfg", lua_vga_setfg);
 	lua_setfield_function(L, "setbg", lua_vga_setbg);
 	lua_setfield_number(L, "BLACK", BLACK);
