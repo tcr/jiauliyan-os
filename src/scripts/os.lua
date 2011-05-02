@@ -80,6 +80,15 @@ end
 --[[--------------------------------------------------------------------
 Jiauliyan OS Lua Command Line
 ----------------------------------------------------------------------]]
+--remove backspace (hack)
+function removebackspace(cmd)
+	 cmd, count = string.gsub(cmd, ".\b","",1)
+	 if (count > 0) then 
+	    	return removebackspace(cmd) 
+	 else
+		return cmd 
+	 end
+end
 
 -- register commands
 
@@ -136,7 +145,7 @@ register_command("send-tweet", "Specify and send a tweet.", function (args, line
 		 ["Content-Type"]="application/x-www-form-urlencoded"},
 		url_encode_table({status=string.sub(line, ("send-tweet "):len(), ("send-tweet "):len() + 140)}),
 		function (msg)
-			if not msg or msg['code'] ~= "200" then
+			if not msg or not msg['body'] or msg['code'] ~= "200" then
 				print("Error: could not receive tweets.")
 			else
 				for i,v in ipairs(json.decode(msg['body'])) do
@@ -194,6 +203,7 @@ function cli()
 		io.write("> ")
 		io.flush()
 		cmd = trim(io.read())
+		cmd = removebackspace(cmd)
 		
 		local args = {}
 		for v in cmd:gmatch("%S+") do

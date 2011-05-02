@@ -157,6 +157,7 @@ void keyboard_interrupt(struct regs *r)
         *  held. If shift is held using the larger lookup table,
         *  you would add 128 to the scancode when you look for it */
         /* left or right shift pressed! */
+	    /*printf("|%d|", scancode);*/
 	    if ((scancode == 42) || (scancode == 54)){
 		    shift_pressed++;
 	    } else if (scancode == 58) {
