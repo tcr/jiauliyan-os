@@ -1,3 +1,8 @@
+/* bkerndev - Bran's Kernel Development Tutorial
+ * By:   Brandon F. (friesenb@gmail.com)
+ *
+ * Notes: No warranty expressed or implied. Use at own risk. */
+
 /* We will use this later on for reading from the I/O ports to get data
  *  from devices such as the keyboard. We are using what is called
  *  'inline assembly' in these routines to actually do the work */

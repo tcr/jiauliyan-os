@@ -1,3 +1,8 @@
+/* bkerndev - Bran's Kernel Development Tutorial
+ * By:   Brandon F. (friesenb@gmail.com)
+ *
+ * Notes: No warranty expressed or implied. Use at own risk. */
+
 #include <system.h>
 #include <string.h>
 

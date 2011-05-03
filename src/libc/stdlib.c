@@ -1,3 +1,12 @@
+/*
+ * Jiauliyan OS - Released under the MIT License
+ * Copyright (C) 2011 Paul Booth, Jialiya Huang, Tim Ryan
+ * https://github.com/timcameronryan/jiauliyan
+ * 
+ * Memory management based on code from The C Programming Language
+ * Copyright (c) 1978 Brian Kernighan, Dennis Ritchie
+ */
+
 #include <common.h>
 #include <stdlib.h>
 #include <stream.h>

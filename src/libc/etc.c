@@ -1,3 +1,13 @@
+/*
+ * Jiauliyan OS - Released under the MIT License
+ * Copyright (C) 2011 Paul Booth, Jialiya Huang, Tim Ryan
+ * https://github.com/timcameronryan/jiauliyan
+ * 
+ * String conversion functions based on code from Sanos OS
+ * Released under the BSD License
+ * http://www.jbox.dk/sanos/
+ */
+
 #include <common.h>
 #include <stddef.h>
 #include <signal.h>

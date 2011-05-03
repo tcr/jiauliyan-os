@@ -1,3 +1,8 @@
+; bkerndev - Bran's Kernel Development Tutorial
+; By:   Brandon F. (friesenb@gmail.com)
+;
+; Notes: No warranty expressed or implied. Use at own risk.
+
 global loader           ; making entry point visible to linker
 extern kmain            ; kmain is defined elsewhere
  

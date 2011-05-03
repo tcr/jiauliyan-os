@@ -1,8 +1,15 @@
+/*
+ * Jiauliyan OS - Released under the MIT License
+ * Copyright (C) 2011 Paul Booth, Jialiya Huang, Tim Ryan
+ * https://github.com/timcameronryan/jiauliyan
+ * 
+ * Based on work by Nick Johnson's Rhombus OS, under the OpenBSD license
+ * Copyright (C) 2009, 2010 Nick Johnson <nickbjohnson4224 at gmail.com>
+ * https://github.com/nickbjohnson4224/rhombus/
+ */
+
 #include <math.h>
 #include <stdint.h>
-
-// Reference:
-// https://github.com/nickbjohnson4224/rhombus/tree/master/libc/math
 
 /*
  * trigonometric functions

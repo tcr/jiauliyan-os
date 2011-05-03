@@ -1,3 +1,12 @@
+/*
+ * Jiauliyan OS - Released under the MIT License
+ * Copyright (C) 2011 Paul Booth, Jialiya Huang, Tim Ryan
+ * https://github.com/timcameronryan/jiauliyan
+ * 
+ * Based on code from Bran's Kernel Development Tutorial
+ * http://www.osdever.net/tutorials/view/brans-kernel-development-tutorial
+ */
+
 #ifndef __KEYBOARD_H
 #define __KEYBOARD_H
 

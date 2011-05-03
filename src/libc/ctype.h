@@ -1,3 +1,9 @@
+/*
+ * Jiauliyan OS - Released under the MIT License
+ * Copyright (C) 2011 Paul Booth, Jialiya Huang, Tim Ryan
+ * https://github.com/timcameronryan/jiauliyan
+ */
+
 #ifndef __CTYPE_H
 #define __CTYPE_H
 
@@ -15,7 +21,7 @@
 #define isxdigit(c) (isxupper(c) || isxlower(c))
 #define isxlower(c) (isdigit(c) || (c >= 'a' && c <= 'f'))
 #define isxupper(c) (isdigit(c) || (c >= 'A' && c <= 'F'))
-#define tolower(c)  (isupper(c) ? ( c - 'A' + 'a') : (c))
+#define tolower(c)  (isupper(c) ? (c - 'A' + 'a') : (c))
 #define toupper(c)  (islower(c) ? (c - 'a' + 'A') : (c))
 
 #endif

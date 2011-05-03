@@ -1,8 +1,9 @@
 /* bkerndev - Bran's Kernel Development Tutorial
-*  By:   Brandon F. (friesenb@gmail.com)
-*  Desc: Interrupt Service Routines installer and exceptions
-*
-*  Notes: No warranty expressed or implied. Use at own risk. */
+ * By:   Brandon F. (friesenb@gmail.com)
+ * Desc: Interrupt Service Routines installer and exceptions
+ *
+ * Notes: No warranty expressed or implied. Use at own risk. */
+
 #include <system.h>
 #include <common.h>
 #include <vga.h>

@@ -1,3 +1,8 @@
+/* bkerndev - Bran's Kernel Development Tutorial
+ * By:   Brandon F. (friesenb@gmail.com)
+ *
+ * Notes: No warranty expressed or implied. Use at own risk. */
+
 #include <system.h>
 
 /* Defines a GDT entry. We say packed, because it prevents the

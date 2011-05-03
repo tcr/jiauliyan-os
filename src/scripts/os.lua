@@ -1,10 +1,16 @@
+--[[--------------------------------------------------------------------
+-- Jiauliyan OS - Released under the MIT License
+-- Copyright (C) 2011 Paul Booth, Jialiya Huang, Tim Ryan
+-- https://github.com/timcameronryan/jiauliyan
+--]]--------------------------------------------------------------------
+
 json = require("dkjson").json
 
 print("Loading lua code...")
 
 --[[--------------------------------------------------------------------
-Serial Communication
-----------------------------------------------------------------------]]
+--Serial Communication
+--]]--------------------------------------------------------------------
 
 -- kitshy loading bar
 
@@ -86,8 +92,8 @@ function send_message(msg, wait, callback)
 end
 
 --[[--------------------------------------------------------------------
-HTTP lib
-----------------------------------------------------------------------]]
+--HTTP lib
+--]]--------------------------------------------------------------------
 
 -- http requests over serial
 
@@ -112,8 +118,9 @@ function url_encode_table(t)
 end
 
 --[[--------------------------------------------------------------------
-Jiauliyan OS Lua Command Line
-----------------------------------------------------------------------]]
+--Jiauliyan OS Lua Command Line
+--]]--------------------------------------------------------------------
+
 --remove backspace (hack)
 function removebackspace(cmd)
 	 cmd, count = string.gsub(cmd, ".\b","",1)
