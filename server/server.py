@@ -1,7 +1,6 @@
 import io
 import httplib2
 import json
-import img2txt
 import base64, sys
 
 if len(sys.argv) < 2:

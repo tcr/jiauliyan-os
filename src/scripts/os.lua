@@ -1,7 +1,7 @@
 --[[--------------------------------------------------------------------
--- Jiauliyan OS - Released under the MIT License
--- Copyright (C) 2011 Paul Booth, Jialiya Huang, Tim Ryan
--- https://github.com/timcameronryan/jiauliyan
+--  Jiauliyan OS - Released under the MIT License
+--  Copyright (C) 2011 Paul Booth, Jialiya Huang, Tim Ryan
+--  https://github.com/timcameronryan/jiauliyan
 --]]--------------------------------------------------------------------
 
 json = require("dkjson").json
@@ -9,7 +9,7 @@ json = require("dkjson").json
 print("Loading lua code...")
 
 --[[--------------------------------------------------------------------
---Serial Communication
+--  Serial Communication
 --]]--------------------------------------------------------------------
 
 -- kitshy loading bar
@@ -92,7 +92,7 @@ function send_message(msg, wait, callback)
 end
 
 --[[--------------------------------------------------------------------
---HTTP lib
+--  HTTP lib
 --]]--------------------------------------------------------------------
 
 -- http requests over serial
@@ -118,7 +118,29 @@ function url_encode_table(t)
 end
 
 --[[--------------------------------------------------------------------
---Jiauliyan OS Lua Command Line
+--  VGA Effects
+--]]--------------------------------------------------------------------
+
+function temp_screen(callback)
+	local vgad = vga.getdata()
+	
+	callback(vgad)
+
+	for x=1,80 do
+		for y=1,25 do
+			local i = y*vga.SCREEN_WIDTH + x
+			vga.setfg(vgad.fg[i])
+			vga.setbg(vgad.bg[i])
+			vga.placechar(vgad.chars:sub(i,i), x-1, y-1)
+		end
+	end
+	
+	vga.setfg(vga.WHITE)
+	vga.setbg(vga.DARK_GREY)
+end
+
+--[[--------------------------------------------------------------------
+--  Jiauliyan OS Lua Command Line
 --]]--------------------------------------------------------------------
 
 --remove backspace (hack)
@@ -226,9 +248,64 @@ register_command("image", "Specify a URL of an image to display.", function (arg
 					io.write(ch)
 				end
 			end
+		
 			vga.setbg(vga.DARK_GREY)
 			vga.setfg(vga.WHITE)
 		end)
+end)
+
+-- alert command
+
+register_command("alert", "Throws a wrench in our VGA driver.", function ()
+	temp_screen(function (vgad)
+		local dx, dy, dw, dh = 2, 2, 74, 20
+		
+		-- display all available characters
+		for i=1,255 do
+			vga.setfg(vga.LIGHT_RED)
+			vga.setbg(vga.BLACK)
+			vga.placechar(string.char(i), (i-1) % 80, math.floor((i-1)/80))
+		end
+		
+		-- modal dialog
+		vga.setfg(vga.WHITE)
+		vga.setbg(vga.BLUE)
+		for y=dy,dy+dh do vga.placechar(string.char(186), dx, y) end
+		for y=dy,dy+dh do vga.placechar(string.char(186), dx+dw, y) end
+		for x=dx,dx+dw do vga.placechar(string.char(205), x, dy) end
+		for x=dx,dx+dw do vga.placechar(string.char(205), x, dy+dh) end
+		vga.placechar(string.char(201), dx, dy)
+		vga.placechar(string.char(187), dx+dw, dy)
+		vga.placechar(string.char(200), dx, dy+dh)
+		vga.placechar(string.char(188), dx+dw, dy+dh)
+		for x=dx+1,dx+dw-1 do 
+			for y=dy+1,dy+dh-1 do vga.placechar(' ', x, y) end
+		end
+		
+		local str = "Something awesome is happening!"
+		for x=1,dw-4 do
+			vga.placechar(str:sub(x,x), x+dx+2, dy+4)
+		end
+		
+		for y=dy+1,dy+dh+1 do
+			local i = y*vga.SCREEN_WIDTH + dx+dw+1
+			vga.setfg(vgad.fg[i] % 8)
+			vga.setbg(vgad.bg[i] % 8)
+			vga.placechar(vgad.chars:sub(i, i), dx+dw+1, y)
+		end
+		for x=dx+1,dx+dw+1 do
+			local i = (dy+dh+1)*vga.SCREEN_WIDTH + x
+			vga.setfg(vgad.fg[i] % 8)
+			vga.setbg(vgad.bg[i] % 8)
+			vga.placechar(vgad.chars:sub(i, i), x, dy+dh+1)
+		end
+		
+		vga.setbg(vga.DARK_GREY)
+		vga.setfg(vga.WHITE)
+		
+		--wait
+		io.read()
+	end)
 end)
 
 -- Command line interface loop

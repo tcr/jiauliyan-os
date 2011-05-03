@@ -13,7 +13,8 @@
 
 /* These define our textpointer, our background and foreground
  *  colors (attributes), and x and y cursor coordinates */
-unsigned short *textmemptr;
+unsigned short *vgaptr;
+
 int attrib = 0x0F;
 int csr_x = 0, csr_y = 0;
 
@@ -32,11 +33,11 @@ void scroll(void)
 		/* Move the current text chunk that makes up the screen
 		 *  back in the buffer by a line */
 		temp = csr_y - 25 + 1;
-		memcpy(textmemptr, textmemptr + temp * 80, (25 - temp) * 80 * 2);
+		memcpy(vgaptr, vgaptr + temp * 80, (25 - temp) * 80 * 2);
 
 		/* Finally, we set the chunk of memory that occupies
 		 *  the last line of text to our 'blank' character */
-		memsetw(textmemptr + (25 - temp) * 80, blank, 80);
+		memsetw(vgaptr + (25 - temp) * 80, blank, 80);
 		csr_y = 25 - 1;
 	}
 }
@@ -78,7 +79,7 @@ void vga_cls()
 	/* Sets the entire screen to spaces in our current
 	 *  color */
 	for(i = 0; i < 25; i++)
-		memsetw (textmemptr + i * 80, blank, 80);
+		memsetw (vgaptr + i * 80, blank, 80);
 
 	/* Update out virtual cursor, and then move the
 	 *  hardware cursor */
@@ -92,8 +93,15 @@ void vga_cls()
 void vga_placechar(char c, int x, int y)
 {
 	unsigned att = attrib << 8;
-	unsigned short *where = textmemptr + (y * 80 + x);
-	*where = c | att;	/* Character AND attributes: color */
+	unsigned short *where = vgaptr + (y * 80 + x);
+	*where = ((unsigned char) c) | att;	/* Character AND attributes: color */
+}
+
+/* gets pointer to vga memory */
+
+unsigned short *vga_getptr()
+{
+	return vgaptr;
 }
 
 /* Puts a single character on the screen */
@@ -133,8 +141,8 @@ void vga_putchar(char c)
 	 *  Index = [(y * width) + x] */
 	else if(c >= ' ')
 	{
-		where = textmemptr + (csr_y * 80 + csr_x);
-		*where = c | att;	/* Character AND attributes: color */
+		where = vgaptr + (csr_y * 80 + csr_x);
+		*where = ((unsigned char) c) | att;	/* Character AND attributes: color */
 		csr_x++;
 	}
 
@@ -183,7 +191,7 @@ stream_s *vgaout;
 void vga_init(void)
 {
 	// set text mem pointer, then clear screen
-	textmemptr = (unsigned short *)0xB8000;
+	vgaptr = (unsigned short *)0xB8000;
 	vga_cls();
 	
 	// initialize vga stream

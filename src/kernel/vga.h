@@ -14,6 +14,7 @@
 
 extern void vga_cls();
 extern void vga_placechar(char c, int x, int y);
+extern unsigned short *vga_getptr();
 extern void vga_putchar(char c);
 extern void vga_setbg(unsigned char bg);
 extern void vga_setfg(unsigned char fg);

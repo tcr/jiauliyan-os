@@ -73,6 +73,46 @@ int lua_serial_receive_all(lua_State *L)
  * vga functions
  */
 
+int lua_vga_getdata(lua_State *L)
+{
+	unsigned short *vgaptr = vga_getptr();
+	int i;
+	
+    lua_newtable(L);
+    
+    /* characters */
+	lua_pushstring(L, "chars");	
+	unsigned char *chars = malloc(sizeof(unsigned char)*SCREEN_HEIGHT*SCREEN_WIDTH);
+    for (i = 0; i < SCREEN_HEIGHT*SCREEN_WIDTH; i++) {
+		chars[i] = vgaptr[i] & 0xFF;
+    }
+	lua_pushstring(L, (char *) chars);
+	free(chars);
+    lua_settable(L, -3);
+    
+    /* bg */
+	lua_pushstring(L, "bg");	
+    lua_newtable(L);
+    for (i = 0; i < SCREEN_HEIGHT*SCREEN_WIDTH; i++) {
+        lua_pushnumber(L, i+1); // index
+        lua_pushnumber(L, (vgaptr[i] >> 12) & 0xF); // value
+        lua_settable(L, -3); // store and pop pair
+    }
+    lua_settable(L, -3);
+    
+    /* fg */
+	lua_pushstring(L, "fg");	
+    lua_newtable(L);
+    for (i = 0; i < SCREEN_HEIGHT*SCREEN_WIDTH; i++) {
+        lua_pushnumber(L, i+1); // index
+        lua_pushnumber(L, (vgaptr[i] >> 8) & 0xF); // value
+        lua_rawset(L, -3); // store and pop pair
+    }
+    lua_settable(L, -3);
+    
+	return 1;
+}
+
 int lua_vga_setfg(lua_State *L)
 {
 	int color = (int) lua_tonumber(L, -1);
@@ -136,6 +176,7 @@ int luaopen_kernel(lua_State *L)
 	lua_setfield_function(L, "placechar", lua_vga_placechar);
 	lua_setfield_function(L, "setfg", lua_vga_setfg);
 	lua_setfield_function(L, "setbg", lua_vga_setbg);
+	lua_setfield_function(L, "getdata", lua_vga_getdata);
 	lua_setfield_number(L, "BLACK", BLACK);
 	lua_setfield_number(L, "BLUE", BLUE);
 	lua_setfield_number(L, "GREEN", GREEN);
@@ -152,6 +193,8 @@ int luaopen_kernel(lua_State *L)
 	lua_setfield_number(L, "LIGHT_MAGENTA", LIGHT_MAGENTA);
 	lua_setfield_number(L, "LIGHT_BROWN", LIGHT_BROWN);
 	lua_setfield_number(L, "WHITE", WHITE);
+	lua_setfield_number(L, "SCREEN_WIDTH", SCREEN_WIDTH);
+	lua_setfield_number(L, "SCREEN_HEIGHT", SCREEN_HEIGHT);
 	lua_setglobal(L, "vga");
 	
 	return 0;
