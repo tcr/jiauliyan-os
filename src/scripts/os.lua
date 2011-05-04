@@ -258,7 +258,7 @@ end)
 
 register_command("alert", "Throws a wrench in our VGA driver.", function ()
 	temp_screen(function (vgad)
-		local dx, dy, dw, dh = 2, 2, 74, 20
+		local dx, dy, dw, dh = 20, 10, 40, 10
 		
 		-- display all available characters
 		for i=1,255 do
