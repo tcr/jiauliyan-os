@@ -55,5 +55,5 @@ while True:
 		on_receive(id, jd)
 	except Exception, e:
 		# dummy message
-		send_json(id, None)
+		send_message(id, "{}")
 		print "[ERROR] in on_receive: " + str(e)
