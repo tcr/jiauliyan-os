@@ -16,6 +16,7 @@
 #include <ctype.h>
 
 #include <vga.h>
+#include <memory.h>
 
 /*
  * utility
@@ -46,8 +47,8 @@ typedef struct header {
 #define BLOCK_PTR(B)	((void *) B+1)
 #define PTR_BLOCK(B)	(((Header *) B)-1)
 
-#define MEMLOC			((char *) 0x02000000)		/* memory start */
-#define ALLOCSIZ		1024*1024*256/BLOCKSIZ		/* memory size in blocks */
+#define MEMLOC			memory_ptr()				/* memory start */
+#define ALLOCSIZ		memory_size()/BLOCKSIZ		/* memory size in blocks */
 
 static Header base; /* root block */
 static Header *freep = NULL; /* start of free block list */

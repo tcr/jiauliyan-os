@@ -13,11 +13,10 @@
 #include <stdint.h>
 #include <errno.h>
 #include <stream.h>
+
 #include <keyboard.h>
 #include <vga.h>
-
 #include <serial.h>
-
 
 /*
  * virtual filesystem

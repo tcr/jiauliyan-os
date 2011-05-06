@@ -1,1 +1,1 @@
-qemu -kernel bin/kernel.bin -no-kvm -serial pty -m 512
+qemu -kernel bin/kernel.bin -no-kvm -serial pty -m 128 -net nic,model=rtl8139,vlan=1,macaddr=52:54:00:12:34:56

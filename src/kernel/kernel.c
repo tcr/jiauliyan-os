@@ -8,6 +8,7 @@
  */
 
 #include <common.h>
+#include <multiboot.h>
 #include <system.h>
 #include <stdlib.h>
 #include <string.h>
@@ -18,6 +19,7 @@
 #include <serial.h>
 #include <keyboard.h>
 #include <timer.h>
+#include <memory.h>
 
 #include "../../lua-5.1/src/lua.h"
 #include "../../lua-5.1/src/lualib.h"
@@ -65,6 +67,7 @@ void kernel_start()
 	puts("Address of kernel_start(): ");
 	stream_putpointer(vgaout, &kernel_start);
 	putchar('\n');
+	printf("Memory start: %p (%d Mb)\n", memory_ptr(), (int) memory_size()/1024/1024);
 
 	/*
 	puts("Testing write to serial port...\n");
@@ -141,27 +144,23 @@ void kernel_start()
 	}
 }
 
-void kmain( void* mbd, unsigned int magic )
+void kmain(multiboot_info_t *mbt, unsigned int magic)
 {
 	if ( magic != 0x2BADB002 )
 	{
-		/* Something went not according to specs. Print an error */
-		/* message and halt, but do *not* rely on the multiboot */
-		/* data structure. */
+		/* Something went not according to specs. Can't rely on multiboot structure. */
+		FATAL("Multiboot header was invalid.");
+		return;
 	}
-	
-	/* You could either use multiboot.h */
-	/* (http://www.gnu.org/software/grub/manual/multiboot/multiboot.html#multiboot_002eh) */
-	/* or do your offsets yourself. The following is merely an example. */ 
-	char *boot_loader_name = (char *) ((long *) mbd)[16];
-	(void) boot_loader_name; // use this eventually
 	
 	// global interrupts table
     gdt_install();
     idt_install();
     isrs_install();
     irq_install();
-    // services
+
+    // drivers
+	memory_init(mbt);
     vga_init();
     timer_install();
     timer_phase(100);
