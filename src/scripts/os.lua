@@ -308,6 +308,26 @@ register_command("alert", "Throws a wrench in our VGA driver.", function ()
 	end)
 end)
 
+
+
+
+-- displays helpful instructions
+
+function display_help()
+	 vga.setfg(vga.LIGHT_CYAN)
+	print("")
+	print("Welcome to the Jiauliyan OS command line.")
+	print("")
+	print("Available commands:")
+	print(command_list)	 
+	vga.setfg(vga.WHITE)
+end
+
+
+-- help function
+
+register_command("help", "Displays available commands.", display_help)
+
 -- Command line interface loop
 -- Executes command as the user enters them
 
@@ -316,13 +336,8 @@ function cli()
 	io.flush()
 	io.read()
 
-	vga.setfg(vga.LIGHT_CYAN)
-	print("")
-	print("Welcome to the Jiauliyan OS command line.")
-	print("")
-	print("Available commands:")
-	print(command_list)
-	vga.setfg(vga.WHITE)
+	display_help()
+	
 	
 	local cmd
 	local serin = ""
